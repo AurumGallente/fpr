@@ -24,6 +24,7 @@ services:
     volumes:
       - "./mysql:/var/lib/mysql"
 
+
   php:
     build:
       context: .
@@ -38,6 +39,17 @@ services:
     volumes:
         - "./src/laravel:/var/www/html"
     working_dir: "/var/www/html"
+
+  phpmyadmin:
+      image: phpmyadmin
+      restart: always
+      ports:
+          - "8080:80"
+      environment:
+          - PMA_ARBITRARY=1
+      depends_on:
+          - mysql
+          - php
 
   npm:
     image: node:current-alpine
