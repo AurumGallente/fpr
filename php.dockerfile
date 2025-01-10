@@ -5,6 +5,23 @@ ENV PHPGROUP=laravel
 ENV PATH="/opt/venv/bin:$PATH"
 ENV PYTHONUNBUFFERED=1
 
+
+# Update package list and install dependencies
+RUN apk update && apk add  \
+    libpng-dev \
+    libwebp-dev \
+    libxpm-dev \
+    libzip-dev \
+    zip \
+    unzip \
+    git \
+    bash \
+    fcgiwrap \
+    libmcrypt-dev \
+    libpq-dev \
+    oniguruma-dev \
+    && rm -rf /var/lib/apt/lists/*
+
 RUN adduser -g ${PHPGROUP} -s /bin/sh -D ${PHPUSER}
 
 RUN sed -i "s/user = www-data/user = ${PHPUSER}/g" /usr/local/etc/php-fpm.d/www.conf
@@ -13,7 +30,7 @@ RUN sed -i "s/group = www-data/group = ${PHPGROUP}/g" /usr/local/etc/php-fpm.d/w
 
 RUN /bin/mkdir -p "/var/www/html/public"
 
-RUN docker-php-ext-install pdo pdo_mysql
+RUN docker-php-ext-install pdo pdo_pgsql -j$(nproc) mbstring zip exif pcntl bcmath opcache
 
 RUN apk add --update --no-cache python3 && ln -sf python3 /usr/bin/python
 
