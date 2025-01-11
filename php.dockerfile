@@ -36,6 +36,13 @@ RUN apk add --update --no-cache python3 && ln -sf python3 /usr/bin/python
 
 RUN apk add --update py-pip
 
+RUN apk add --update linux-headers
+
+RUN apk --no-cache add pcre-dev ${PHPIZE_DEPS} \
+  && pecl install xdebug \
+  && docker-php-ext-enable xdebug \
+  && apk del pcre-dev ${PHPIZE_DEPS}
+
 RUN python -m venv /opt/venv
 
 RUN pip3 install py-readability-metrics

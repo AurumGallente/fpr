@@ -10,7 +10,11 @@ services:
       - "./src/laravel:/var/www/html"
     depends_on:
       - db
+      - db_test
       - php
+    networks:
+      - docker-network
+      - docker-testing-network
 
   db:
       image: bitnami/postgresql:16.3.0
@@ -28,19 +32,38 @@ services:
       networks:
           - docker-network
 
-  pgadmin:
-      image: dpage/pgadmin4
-      environment:
-          PGADMIN_DEFAULT_EMAIL: admin@admin.com
-          PGADMIN_DEFAULT_PASSWORD: secret
-      volumes:
-          - db-data:/bitnami/postgresql
+  db_test:
+      image: bitnami/postgresql:16.3.0
+      platform: linux/amd64
+      shm_size: 64mb
       ports:
-          - "8080:80"
-      depends_on:
-          - db
+          - "5433:5432"
+      restart: unless-stopped
+      volumes:
+          - db-data2:/bitnami/postgresql
+      environment:
+          - POSTGRES_DATABASE=fpr_test
+          - POSTGRES_USERNAME=fpr
+          - POSTGRES_PASSWORD=secret
       networks:
-          - docker-network
+          - docker-testing-network
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: secret
+    volumes:
+      - db-data:/bitnami/postgresql
+      - db-data2:/bitnami/postgresql
+    ports:
+      - "8080:80"
+    depends_on:
+      - db
+      - db_test
+    networks:
+      - docker-network
+      - docker-testing-network
 
 
   php:
@@ -48,7 +71,12 @@ services:
       context: .
       dockerfile: php.dockerfile
     volumes:
-        - "./src/laravel:/var/www/html"
+      - "./src/laravel:/var/www/html"
+    networks:
+      - docker-network
+      - docker-testing-network
+    environment:
+      XDEBUG_MODE: coverage
 
   composer:
     build:
@@ -57,6 +85,9 @@ services:
     volumes:
         - "./src/laravel:/var/www/html"
     working_dir: "/var/www/html"
+    networks:
+        - docker-network
+        - docker-testing-network
 
   npm:
     image: node:current-alpine
@@ -64,6 +95,9 @@ services:
         - "./src/laravel:/var/www/html"
     entrypoint: ["npm"]
     working_dir: "/var/www/html"
+    networks:
+        - docker-network
+        - docker-testing-network
 
   artisan:
     build:
@@ -74,15 +108,19 @@ services:
     working_dir: "/var/www/html"
     depends_on:
         - db
+        - db_test
         - php
     entrypoint: ["php", "/var/www/html/artisan"]
     networks:
       - docker-network
+      - docker-testing-network
 
 
 volumes:
     db-data:
+    db-data2:
 
 networks:
     docker-network:
+    docker-testing-network:
         driver: bridge
