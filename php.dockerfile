@@ -43,6 +43,8 @@ RUN apk --no-cache add pcre-dev ${PHPIZE_DEPS} \
   && docker-php-ext-enable xdebug \
   && apk del pcre-dev ${PHPIZE_DEPS}
 
+RUN chown -R www-data:www-data /var/www/html/
+
 RUN python -m venv /opt/venv
 
 RUN pip3 install py-readability-metrics

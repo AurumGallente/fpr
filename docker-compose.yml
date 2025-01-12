@@ -100,6 +100,7 @@ services:
         - docker-testing-network
 
   artisan:
+    user: "${userid}:${groupid}"
     build:
       context: .
       dockerfile: php.dockerfile
@@ -108,7 +109,6 @@ services:
     working_dir: "/var/www/html"
     depends_on:
         - db
-        - db_test
         - php
     entrypoint: ["php", "/var/www/html/artisan"]
     networks:
