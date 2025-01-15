@@ -22,7 +22,7 @@ lw = r.linsear_write()
 
 json_result = {
 
-            "flesch": {
+            "flesch_kincaid": {
                 "score": kincaid.score,
                 "grade_level": int(kincaid.grade_level)
             },

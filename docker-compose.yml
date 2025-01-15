@@ -31,21 +31,21 @@ services:
       networks:
           - docker-network
 
-#  db_test:
-#      image: bitnami/postgresql:16.3.0
-#      platform: linux/amd64
-#      shm_size: 64mb
-#      ports:
-#          - "${POSTGRES_TEST_OUTER_PORT}:${POSTGRES_TEST_INNER_PORT}"
-#      restart: unless-stopped
-#      volumes:
-#          - db-data2:/bitnami/postgresql
-#      environment:
-#          - POSTGRES_DATABASE=${DB_TEST_DATABASE}
-#          - POSTGRES_USERNAME=${DB_TEST_USERNAME}
-#          - POSTGRES_PASSWORD=${DB_TEST_PASSWORD}
-#      networks:
-#          - docker-testing-network
+  db_test:
+      image: bitnami/postgresql:16.3.0
+      platform: linux/amd64
+      shm_size: 64mb
+      ports:
+          - "${POSTGRES_TEST_OUTER_PORT}:${POSTGRES_TEST_INNER_PORT}"
+      restart: unless-stopped
+      volumes:
+          - db-data2:/bitnami/postgresql
+      environment:
+          - POSTGRES_DATABASE=${DB_TEST_DATABASE}
+          - POSTGRES_USERNAME=${DB_TEST_USERNAME}
+          - POSTGRES_PASSWORD=${DB_TEST_PASSWORD}
+      networks:
+          - docker-testing-network
 
   pgadmin:
     image: dpage/pgadmin4
@@ -108,6 +108,7 @@ services:
     working_dir: "/var/www/html"
     depends_on:
         - db
+        - db_test
         - php
     entrypoint: ["php", "/var/www/html/artisan"]
     networks:
