@@ -43,7 +43,7 @@
                     <div class="">
                         <div class="card m-1 w-100" style="width: 20rem;">
                             <div class="card-body">
-                                <h6 class="card-title">Version: <b>{{$text->version}}</b> by: <b>{{$text->user->name}}</b></h6>
+                                <a class="card-title" href="{{route('texts.show', ['id'=>$text->id])}}">Version {{$text->version}}</a>
                                 <p class="card-text italic">{{\Str::of($text->content)->words(30)}}</p>
                             </div>
                             <div class="card-footer">

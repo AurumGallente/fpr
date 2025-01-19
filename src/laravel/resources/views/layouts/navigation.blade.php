@@ -13,7 +13,7 @@
                             <a class="nav-link" href="{{route('projects.index')}}">Projects</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">Texts</a>
+                            <a class="nav-link" href="{{route('texts.index')}}">Texts</a>
                         </li>
                         <li>
                             <div class="dropdown">

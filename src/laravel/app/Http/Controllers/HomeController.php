@@ -3,9 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ReadabilityHelper;
+use App\Models\Project;
+use App\Models\Text;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+use PharIo\Manifest\Author;
 
 class HomeController extends Controller implements HasMiddleware
 {
@@ -34,6 +38,10 @@ class HomeController extends Controller implements HasMiddleware
      */
     public function index()
     {
-        return view('home');
+        $projectCount = Project::count('id');
+        $textCount = Text::count('id');
+        $userCount = User::count('id');
+        $authorCount = Project::distinct('user_id')->count('user_id');
+        return view('home', compact('projectCount', 'textCount', 'userCount', 'authorCount'));
     }
 }

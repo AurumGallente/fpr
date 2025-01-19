@@ -12,6 +12,7 @@ use App\Models\Project;
 
 class TextsController extends Controller implements HasMiddleware
 {
+    const PER_PAGE=10;
     /**
      * @return array|Middleware[]
      */
@@ -57,5 +58,27 @@ class TextsController extends Controller implements HasMiddleware
             'version' => $version,
         ]);
         return redirect(route('projects.show', ['id' => $request->project_id]));
+    }
+
+    /**
+     * @param Request $request
+     * @return View
+     */
+    public function show(Request $request): View
+    {
+        $text = Text::find($request->id);
+        return view('texts.show', ['text' => $text]);
+    }
+
+    /**
+     * @param Request $request
+     * @return View
+     */
+    public function index(Request $request): View
+    {
+        $texts = Text::with(['project', 'user'])
+            ->orderBy('id','desc')
+            ->paginate(self::PER_PAGE);
+        return view('texts.index', ['texts' => $texts]);
     }
 }

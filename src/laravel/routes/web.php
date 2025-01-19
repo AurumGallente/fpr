@@ -10,9 +10,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', [HomeController::class, 'index'])->name('dashboard');
 
 Route::get('/home', [HomeController::class, 'index'])->name('home.index');
 
@@ -31,6 +29,9 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/projects/{id}/texts/create',[TextsController::class, 'create'])->name('projects.texts.create');
     Route::post('/projects/{project_id}/texts/store',[TextsController::class, 'store'])->name('projects.texts.store');
+
+    Route::get('/texts/{id}', [TextsController::class, 'show'])->name('texts.show');
+    Route::get('/texts', [TextsController::class, 'index'])->name('texts.index');
 });
 
 require __DIR__.'/auth.php';

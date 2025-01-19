@@ -67,7 +67,7 @@ class ReadabilityHelper
     private function checkWordsNumber(): void
     {
 
-        if(count(explode(' ', $this->text)) < self::LIMIT)
+        if((new WordCounterHelper($this->text))->countWords() < self::LIMIT)
         {
             $this->isValid = false;
         } else

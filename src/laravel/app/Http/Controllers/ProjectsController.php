@@ -12,7 +12,7 @@ use Illuminate\View\View;
 
 class ProjectsController extends Controller implements HasMiddleware
 {
-    static $PER_PAGE=10;
+    const PER_PAGE=10;
 
     /**
      * @return array|Middleware[]
@@ -31,7 +31,7 @@ class ProjectsController extends Controller implements HasMiddleware
      */
     public function index(Request $request): View
     {
-        $projects = Project::paginate(self::$PER_PAGE);
+        $projects = Project::paginate(self::PER_PAGE);
 
         return view('projects.index', ['projects' => $projects]);
     }
@@ -72,7 +72,7 @@ class ProjectsController extends Controller implements HasMiddleware
     {
         $project = Project::find($request->id);
         $user = $project->user;
-        $texts = $project->texts()->orderBy('version', 'desc')->paginate(self::$PER_PAGE);
+        $texts = $project->texts()->orderBy('version', 'desc')->paginate(self::PER_PAGE);
         return view('projects.show', [
             'project' => $project,
             'user' => $user,
