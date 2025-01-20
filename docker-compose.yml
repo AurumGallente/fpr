@@ -114,6 +114,8 @@ services:
     networks:
       - docker-network
       - docker-testing-network
+    environment:
+        XDEBUG_MODE: coverage
 
 
 volumes:

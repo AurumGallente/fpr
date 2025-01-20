@@ -23,7 +23,7 @@
     <hr class="hr-blurry " />
     <div class="row">
         <div class="col-9">
-            {{ $projects->links() }}
+            {{ $projects->links('pagination::bootstrap-4') }}
         </div>
     </div>
 
