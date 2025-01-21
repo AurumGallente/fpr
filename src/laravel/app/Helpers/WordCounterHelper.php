@@ -21,6 +21,6 @@ class WordCounterHelper
     public function countWords(): int
     {
         // change later when business logic will be more sophisticated
-        return str_word_count($this->text);
+        return count(preg_split('~[\p{Z}\p{P}]+~u', $this->text, null, PREG_SPLIT_NO_EMPTY));
     }
 }

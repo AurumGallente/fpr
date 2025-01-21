@@ -47,7 +47,19 @@
                                 <p class="card-text italic">{{\Str::of($text->content)->words(30)}}</p>
                             </div>
                             <div class="card-footer">
-                                <h6 class="card-subtitle mb-2 text-muted">Posted: {{$text->created_at->format('H:i d-m-Y')}}</h6>
+                                <p class="card-subtitle mb-2 text-muted">Posted: {{$text->created_at->format('H:i d-m-Y')}}
+                                @if($text->words)
+                                    | Words: {{$text->words}}
+                                @endif
+
+                                @if($text->metrics)
+                                    |
+                                    <a href="#" class="" data-toggle="tooltip" data-placement="top" title="Automated Readability Index">
+                                        ARI: {{ number_format($text->readabilityMetrics()->ari->score, 1) }}
+                                    </a>
+                                    | ARI Age: {{str_replace('_', ' ', $text->readabilityMetrics()->ari->grade_levels[0])}}
+                                @endif
+                                </p>
                             </div>
                         </div>
                     </div>
