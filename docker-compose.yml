@@ -65,6 +65,7 @@ services:
 
 
   php:
+    user: "${USERID}:${GROUPID}"
     build:
       context: .
       dockerfile: php.dockerfile

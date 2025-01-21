@@ -1,12 +1,27 @@
 import sys
 import nltk
+import pycountry
 import json
 
 from readability import Readability
 
+def get_language_name_lowercase(code):
+    try:
+        # Use pycountry to look up the language by its ISO 639-1 code
+        language = pycountry.languages.get(alpha_2=code)
+        if language:
+            return language.name.lower()  # Convert to lowercase
+        else:
+            return "english"
+    except LookupError:
+        return "language code not found."
+
 
 text = sys.argv[1]
-language = sys.argv[2]
+lang = sys.argv[2]
+
+language = get_language_name_lowercase(lang)
+
 
 r = Readability(text)
 

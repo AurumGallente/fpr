@@ -60,4 +60,5 @@ class Text extends Model
             return new stdClass();
         }
     }
+
 }
