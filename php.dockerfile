@@ -51,6 +51,8 @@ RUN pip3 install py-readability-metrics
 
 RUN pip3 install pycountry
 
+RUN pip3 install faker
+
 RUN python -m nltk.downloader -d /usr/local/share/nltk_data punkt_tab
 
 RUN python -m nltk.downloader -d /usr/local/share/nltk_data stopwords

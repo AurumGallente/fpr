@@ -21,7 +21,7 @@ migrate:
 	$(dc) run -it --rm php /var/www/html/artisan migrate
 
 listen:
-	$(dc) run -it --rm php /var/www/html/artisan queue:listen
+	$(dc) run -it --rm php /var/www/html/artisan queue:listen --timeout=3600
 
 seed:
 	$(dc) run -it --rm php /var/www/html/artisan db:seed

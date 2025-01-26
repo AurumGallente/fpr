@@ -47,7 +47,11 @@
         </div>
         <div class="row">
             <h3 class="text-center">Content</h3>
-            <div class="lead bg-white text-black">{{$text->content}}</div>
+            <div class="lead bg-white text-black">
+                @foreach(explode("\n", $text->content) as $paragraph)
+                    {{ $paragraph }}<br>
+                @endforeach
+            </div>
         </div>
     </div>
 </x-app>

@@ -2,36 +2,36 @@
 
 namespace App\Console\Commands;
 
-use App\Jobs\ProcessReadability;
-use Illuminate\Console\Command;
 use App\Models\Text;
+use Illuminate\Console\Command;
+use App\Jobs\CreateChunks as CreateChunksJob;
 
-class CountReadability extends Command
+class CreateChunks extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'app:count-readability';
+    protected $signature = 'app:create-chunks';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Creates jobs for all unprocessed texts to calculate readability';
+    protected $description = 'Command description';
 
     /**
      * Execute the console command.
      */
     public function handle()
     {
-        $texts = Text::where('processed', false)->get();
+        $texts = Text::whereNull('chunks_ids')->get();
 
         foreach ($texts as $text)
         {
-            ProcessReadability::dispatch($text)->onQueue('text_processing');
+            CreateChunksJob::dispatch($text)->onQueue('text_processing');
         }
     }
 }

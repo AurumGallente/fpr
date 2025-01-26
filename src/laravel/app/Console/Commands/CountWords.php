@@ -30,7 +30,7 @@ class CountWords extends Command
         $texts = Text::whereNull('words')->get();
         foreach ($texts as $text)
         {
-            ProcessWordCount::dispatch($text);
+            ProcessWordCount::dispatch($text)->onQueue('text_processing');
         }
     }
 }
