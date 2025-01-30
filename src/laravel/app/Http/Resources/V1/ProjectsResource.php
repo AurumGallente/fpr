@@ -35,9 +35,8 @@ class ProjectsResource extends JsonResource
                     ]
                 ]
             ],
-            'links' =>  [
-                ['self' => route('projects.show', $this->id)]
-            ],
+            'links' => ['self' => route('api.projects.show', $this->id)]
+            ,
         ];
     }
 }

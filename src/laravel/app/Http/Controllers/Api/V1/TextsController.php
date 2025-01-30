@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\V1\StoreTextRequest;
-use App\Http\Requests\V1\UpdateTextRequest;
 use App\Http\Resources\V1\TextsResource;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use App\Models\Text;
 
 class TextsController extends Controller
@@ -13,11 +13,11 @@ class TextsController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(): AnonymousResourceCollection
     {
         return TextsResource::collection(
-            Text::where('project_id', '=', request()->input('project_id'))
-            ->paginate()
+            Text::where('project_id', '=', request()->project_id)
+            ->paginate()->withQueryString()
         );
     }
 
@@ -40,32 +40,8 @@ class TextsController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Text $text)
+    public function show(Text $text): TextsResource
     {
         return new TextsResource($text);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Text $text)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateTextRequest $request, Text $text)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Text $text)
-    {
-        //
     }
 }

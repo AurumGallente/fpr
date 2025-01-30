@@ -29,7 +29,7 @@ class ShowProjectRequest extends FormRequest
         ];
     }
 
-    public function messages()
+    public function messages(): array
     {
         return [
             'user_id.in' => "wrong owner of the project",
