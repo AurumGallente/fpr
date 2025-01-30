@@ -21,13 +21,16 @@ class TextsResource extends JsonResource
                 'version' => $this->version,
                 'project_id' => $this->project_id,
                 'words' => $this->words,
-                'metrics' => json_decode($this->metrics),
-                'content' => $this->when(
-                    $request->routeIs('texts.show'), $this->content
+                $this->mergeWhen(
+                    $request->routeIs('api.projects.texts.show'), [
+                        'metrics' => json_decode($this->metrics),
+                        'content' => $this->content
+                    ]
                 ),
+                'processed' => $this->processed,
                 'created_at' => $this->created_at->format('Y-m-d H:i:s'),
             ],
-            'links' => ['self' => route('api.texts.show', $this->id)]
+            'links' => ['self' => route('api.projects.texts.show', [$this->project_id, $this->id])]
         ];
     }
 }

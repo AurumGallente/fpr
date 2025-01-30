@@ -14,12 +14,10 @@ Route::prefix('V1')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
     });
 
-    Route::middleware('auth:sanctum')
-        ->apiResource('projects', ProjectsController::class)
-        ->names('api.projects');
-    Route::middleware('auth:sanctum')
-        ->apiResource('project/{project_id}/texts', TextsController::class)
-        ->names('api.projects.texts');
+    Route::name('api.')->middleware('auth:sanctum')->group(function () {
+        Route::apiResource('projects', ProjectsController::class);
+        Route::apiResource('projects.texts', TextsController::class);
+    });
 
     Route::get('/user', function (Request $request) {
         return $request->user();
