@@ -24,7 +24,7 @@ class TextsController extends Controller
         $request->validate($request->rules(), $request->messages());
 
         return TextsResource::collection(
-            Text::where('project_id', '=', $project->id)
+            Text::where('project_id', '=', $project->id)->orderByDesc('version')
             ->paginate()->withQueryString()
         );
     }

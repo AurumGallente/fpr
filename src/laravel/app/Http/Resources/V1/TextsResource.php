@@ -30,7 +30,18 @@ class TextsResource extends JsonResource
                 'processed' => $this->processed,
                 'created_at' => $this->created_at->format('Y-m-d H:i:s'),
             ],
-            'links' => ['self' => route('api.projects.texts.show', [$this->project_id, $this->id])]
+            'relationships' => [
+                'project_id' => $this->project_id,
+                'user' => $this->when(
+                    $request->routeIs('api.projects.texts.show'), $this->user->name
+                ),
+            ],
+            'links' => [
+                'self' => route('api.projects.texts.show', [$this->project_id, $this->id]),
+                'project' => $this->when(
+                    $request->routeIs('api.projects.texts.show'), route('api.projects.show', $this->project_id)
+                ),
+            ]
         ];
     }
 }

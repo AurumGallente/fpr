@@ -20,7 +20,10 @@ class ProjectsResource extends JsonResource
             'attributes' => [
                 'name' => $this->name,
                 'description' => $this->when(
-                    $request->routeIs('projects.show'), $this->description
+                    $request->routeIs('api.projects.show'), $this->description
+                ),
+                'texts_count' => $this->when(
+                    $request->routeIs('api.projects.show'), $this->texts->count()
                 ),
                 'created_at' => $this->created_at->format('Y-m-d H:i:s'),
             ],
@@ -30,13 +33,9 @@ class ProjectsResource extends JsonResource
                         'type' => 'language',
                         'id' => $this->language_id,
                     ],
-                    'texts' => [
-
-                    ]
                 ]
             ],
             'links' => ['self' => route('api.projects.show', $this->id)]
-            ,
         ];
     }
 }
