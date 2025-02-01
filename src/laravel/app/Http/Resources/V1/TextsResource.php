@@ -36,6 +36,7 @@ class TextsResource extends JsonResource
                     $request->routeIs('api.projects.texts.show'), $this->user->name
                 ),
             ],
+            'includes' => new ProjectsResource($this->whenLoaded('project')),
             'links' => [
                 'self' => route('api.projects.texts.show', [$this->project_id, $this->id]),
                 'project' => $this->when(

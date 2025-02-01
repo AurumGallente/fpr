@@ -36,7 +36,7 @@ class HomeController extends Controller implements HasMiddleware
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
-    public function index()
+    public function index(): \Illuminate\Contracts\Support\Renderable
     {
         $projectCount = Project::count('id');
         $textCount = Text::count('id');

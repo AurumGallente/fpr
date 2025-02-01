@@ -3,19 +3,21 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Filters\Api\V1\TextsFilter;
 use App\Http\Requests\V1\ShowProjectRequest;
-use App\Http\Requests\V1\StoreTextRequest;
 use App\Http\Resources\V1\TextsResource;
 use App\Models\Project;
+use App\Traits\ApiFilter;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use App\Models\Text;
 
 class TextsController extends Controller
 {
+    use ApiFilter;
     /**
      * Display a listing of the resource.
      */
-    public function index(Project $project): AnonymousResourceCollection
+    public function index(TextsFilter $filter, Project $project): AnonymousResourceCollection
     {
         $request = new ShowProjectRequest([
             'project_id' => $project->id,
@@ -24,23 +26,16 @@ class TextsController extends Controller
         $request->validate($request->rules(), $request->messages());
 
         return TextsResource::collection(
-            Text::where('project_id', '=', $project->id)->orderByDesc('version')
+            Text::filter($filter)->where('project_id', '=', $project->id)->orderByDesc('version')
             ->paginate()->withQueryString()
         );
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StoreTextRequest $request)
-    {
-        //
-    }
 
     /**
      * Display the specified resource.
      */
-    public function show(Project $project, Text $text): TextsResource
+    public function show(TextsFilter $filter, Project $project, Text $text): AnonymousResourceCollection
     {
         $request = new ShowProjectRequest([
             'project_id' => $project->id,
@@ -48,6 +43,6 @@ class TextsController extends Controller
         ]);
         $request->validate($request->rules(), $request->messages());
 
-        return new TextsResource($text);
+        return TextsResource::collection(Text::filter($filter)->paginate());
     }
 }

@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Http\Filters\Api\V1\QueryFilter;
+use App\Http\Filters\Api\V1\TextsFilter;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -117,5 +119,16 @@ class Text extends Model
 
         return $chunks;
     }
+
+    /**
+     * @param Builder $builder
+     * @param QueryFilter $filter
+     * @return Builder
+     */
+    public function scopeFilter(Builder $builder, TextsFilter $filter): Builder
+    {
+        return $filter->apply($builder);
+    }
+
 
 }
