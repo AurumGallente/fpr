@@ -24,4 +24,13 @@ class TextsFilter extends QueryFilter
         return $this->builder->where('version', $v);
     }
 
+    /**
+     * @param bool $v
+     * @return Builder
+     */
+    public function processed(bool $v): Builder
+    {
+        return $this->builder->where('processed', $v);
+    }
+
 }
