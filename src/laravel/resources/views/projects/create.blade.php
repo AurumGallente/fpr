@@ -1,6 +1,6 @@
 <x-app>
     <div class="d-flex flex-row justify-content-center align-items-center">
-        <div class="col-sm-3">
+        <div class="col-sm-8">
             <h2>Create a new project</h2>
             <form method="POST" action="{{ route('projects.store') }}">
                 @csrf
@@ -23,13 +23,15 @@
 
                 <div class="form-group">
                     <label for="description">Description</label>
-                    <textarea name="description" class="form-control" id="description" rows="3" required>{{old('description')}}</textarea>
+                    <textarea name="description" class="form-control" id="description" rows="12" required>{{old('description')}}</textarea>
                     <x-input-error :messages="$errors->get('description')" class="mt-2" />
                 </div>
-
-                <x-primary-button class="ms-4">
-                    {{ __('Create') }}
-                </x-primary-button>
+                <div class=""></div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">
+                        {{ __('Create') }}
+                    </button>
+                </div>
             </form>
         </div>
     </div>
