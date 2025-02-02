@@ -31,7 +31,7 @@ class ProjectsController extends Controller implements HasMiddleware
      */
     public function index(Request $request): View
     {
-        $projects = Project::paginate(self::PER_PAGE);
+        $projects = Project::orderBy('id','desc')->paginate(self::PER_PAGE);
 
         return view('projects.index', ['projects' => $projects]);
     }

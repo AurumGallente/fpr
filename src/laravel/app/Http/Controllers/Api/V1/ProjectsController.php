@@ -25,9 +25,16 @@ class ProjectsController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreProjectRequest $request)
+    public function store(StoreProjectRequest $request): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
     {
-        //
+        $project = new Project();
+        $project->name = $request->input('data.attributes.name');
+        $project->description = $request->input('data.attributes.description');
+        $project->language_id = $request->input('data.attributes.relationships.language.id');
+        $project->user_id = Auth::user()->id;
+        $project->save();
+
+        return new ProjectsResource($project);
     }
 
     /**
