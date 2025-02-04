@@ -70,7 +70,7 @@ class ProjectsController extends Controller implements HasMiddleware
      */
     public function show(Request $request): View
     {
-        $project = Project::find($request->id);
+        $project = Project::findOrFail($request->id);
         $user = $project->user;
         $texts = $project->texts()->orderBy('version', 'desc')->paginate(self::PER_PAGE);
         return view('projects.show', [

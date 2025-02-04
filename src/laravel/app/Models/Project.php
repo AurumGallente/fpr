@@ -61,4 +61,16 @@ class Project extends Model
         return $this->texts()->orderBy('version', 'desc')->first();
     }
 
+    /**
+     * @return bool|null
+     */
+    public function delete(): ?bool
+    {
+        $this->texts()->get()->each(function (Text $text) {
+            $text->delete();
+        });
+
+        return parent::delete();
+    }
+
 }

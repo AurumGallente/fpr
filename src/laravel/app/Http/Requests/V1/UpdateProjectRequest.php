@@ -12,7 +12,7 @@ class UpdateProjectRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -23,7 +23,9 @@ class UpdateProjectRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'data.attributes.name' => ['required', 'string', 'max:255'],
+            'data.attributes.description' => ['required', 'string', 'min:10', 'max:1000'],
+            'data.attributes.relationships.language.id' => ['required', 'integer', 'exists:languages,id'],
         ];
     }
 }
