@@ -4,6 +4,7 @@ namespace App\Policies\Api\V1;
 
 use App\Models\User;
 use App\Models\Project;
+use App\Models\Permission;
 
 class ProjectPolicy
 {
@@ -22,7 +23,13 @@ class ProjectPolicy
      */
     public function update(User $user, Project $project): bool
     {
-        return ($user->id == $project->user_id);
+        if($user->id == $project->user_id)
+        {
+            return $user->tokenCan(Permission::API_V1_UPDATE_OWN_PROJECTS);
+        } else
+        {
+            return $user->tokenCan(Permission::API_V1_UPDATE_ANY_PROJECTS);
+        }
     }
 
     /**
@@ -32,7 +39,13 @@ class ProjectPolicy
      */
     public function show(User $user, Project $project): bool
     {
-        return ($user->id == $project->user_id);
+        if($user->id == $project->user_id)
+        {
+            return $user->tokenCan(Permission::API_V1_SEE_OWN_PROJECTS);
+        } else
+        {
+            return $user->tokenCan(Permission::API_V1_SEE_ALL_PROJECTS);
+        }
     }
 
     /**
@@ -42,7 +55,13 @@ class ProjectPolicy
      */
     public function delete(User $user, Project $project): bool
     {
-        return ($user->id == $project->user_id);
+        if($user->id == $project->user_id)
+        {
+            return $user->tokenCan(Permission::API_V1_DELETE_OWN_PROJECTS);
+        } else
+        {
+            return $user->tokenCan(Permission::API_V1_DELETE_ANY_PROJECTS);
+        }
     }
 
     /**
@@ -52,7 +71,6 @@ class ProjectPolicy
      */
     public function store(User $user, Project $project): bool
     {
-        // no logic yet
-        return true;
+        return $user->tokenCan(Permission::API_V1_CREATE_PROJECT);
     }
 }
