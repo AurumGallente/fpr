@@ -28,7 +28,7 @@ class TextsFilter extends QueryFilter
      * @param bool $v
      * @return Builder
      */
-    public function processed(bool $v): Builder
+    public function processed($v): Builder
     {
         return $this->builder->where('processed', $v);
     }

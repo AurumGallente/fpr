@@ -29,5 +29,8 @@ seed:
 cache:
 	$(dc) run -it --rm php /var/www/html/artisan cache:clear
 
+docs:
+	$(dc) run -it --rm php /var/www/html/artisan scribe:generate
+
 npm_b:
 	$(dc) run --rm npm run build

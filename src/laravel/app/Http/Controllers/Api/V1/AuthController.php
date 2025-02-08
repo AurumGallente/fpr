@@ -18,6 +18,7 @@ class AuthController extends Controller
      * @group Authorisation
      * @unauthenticated
      * @response 200 {"message": "Logged in successfully.", "status": 200, "data": {"token": "15|9Y7nYKbtXVbRguDRIvg0DIDjQ9Uneg3CF1v0GAg8c45704c3"}}
+     * @response 401 {"message": "Invalid credentials."}
      *
      * @param ApiLoginRequest $request
      * @return JsonResponse

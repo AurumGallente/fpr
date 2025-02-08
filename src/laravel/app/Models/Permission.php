@@ -20,6 +20,9 @@ class Permission extends Model
     const API_V1_SEE_ALL_PROJECTS = 'api_v1_see_all_projects';
     const API_V1_UPDATE_ANY_PROJECTS = 'api_v1_update_any_projects';
     const API_V1_DELETE_ANY_PROJECTS = 'api_v1_delete_any_projects';
+    const API_V1_SHOW_ALL_TEXTS = 'api_v1_show_all_texts';
+    const API_V1_SHOW_TEXT = 'api_v1_show_text';
+
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany

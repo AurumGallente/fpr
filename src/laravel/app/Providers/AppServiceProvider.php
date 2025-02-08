@@ -7,6 +7,7 @@ use Illuminate\Support\ServiceProvider;
 use App\Observers\TextObserver;
 use Illuminate\Support\Facades\Gate;
 use App\Policies\Api\V1\ProjectPolicy as V1ProjectPolicy;
+use App\Policies\Api\V1\TextPolicy as V1TextPolicy;
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -28,5 +29,8 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('v1-store', [V1ProjectPolicy::class, 'store']);
         Gate::define('v1-update', [V1ProjectPolicy::class, 'update']);
         Gate::define('v1-delete', [V1ProjectPolicy::class, 'delete']);
+
+        Gate::define('v1-index-text', [V1TextPolicy::class, 'index']);
+        Gate::define('v1-show-text', [V1TextPolicy::class, 'show']);
     }
 }

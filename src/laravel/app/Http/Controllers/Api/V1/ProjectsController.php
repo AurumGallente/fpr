@@ -79,8 +79,6 @@ class ProjectsController extends BaseController
             return $this->error('Project not found', 404);
         }
 
-
-
         if(!$this->authorize(__FUNCTION__, $project))
         {
             return $this->error('No permissions for this resource', 403);
@@ -126,7 +124,7 @@ class ProjectsController extends BaseController
      * Delete the specified project.
      * @param int $project_id
      * @return JsonResponse
-     * @urlParam id integer required The id of the project.
+     * @urlParam id integer required The id of the project
      * @group Project Management
      * @response 200 {"message": "Project id={id} is deleted","status": 200,"data": []}
      * @response 403 {"message":"Wrong owner of a project","status":403}

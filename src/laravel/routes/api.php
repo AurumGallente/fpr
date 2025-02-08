@@ -21,7 +21,4 @@ Route::prefix('V1')->group(function () {
         Route::apiresource('languages', LanguageController::class)->only(['index', 'show']);
     });
 
-    Route::get('/user', function (Request $request) {
-        return $request->user();
-    })->middleware('auth:sanctum');
 });
