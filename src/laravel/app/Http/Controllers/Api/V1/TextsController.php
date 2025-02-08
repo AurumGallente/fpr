@@ -15,7 +15,11 @@ class TextsController extends Controller
 {
     use ApiFilter;
     /**
-     * Display a listing of the resource.
+     * Display a listing of all texts of a given project.
+     * @group Text Management
+     * @response 200 {"data":[{"type":"text","id":1988,"attributes":{"version":2,"project_id":160,"words":1008,"processed":true,"created_at":"2025-01-30 02:14:56"},"relationships":{"project_id":160},"links":{"self":"http://domain.com/api/V1/projects/160/texts/1988"}},{"type":"text","id":1987,"attributes":{"version":1,"project_id":160,"words":1007,"processed":true,"created_at":"2025-01-30 02:00:18"},"relationships":{"project_id":160},"links":{"self":"http://domain.com/api/V1/projects/160/texts/1987"}}],"links":{"first":"http://domain.com/api/V1/projects/160/texts?page=1","last":"http://domain.com/api/V1/projects/160/texts?page=1","prev":null,"next":null},"meta":{"current_page":1,"from":1,"last_page":1,"links":[{"url":null,"label":"&laquo; Previous","active":false},{"url":"http://domain.com/api/V1/projects/160/texts?page=1","label":"1","active":true},{"url":null,"label":"Next &raquo;","active":false}],"path":"http://domain.com/api/V1/projects/160/texts","per_page":15,"to":2,"total":2}}
+     * @response 404 {"message":"Project not found","status":404}
+     * @response 403 {"message":"Wrong owner of a project","status":403}
      */
     public function index(TextsFilter $filter, Project $project): AnonymousResourceCollection
     {
@@ -33,10 +37,23 @@ class TextsController extends Controller
 
 
     /**
-     * Display the specified resource.
+     * Display the specified text of specified project
+     * @group Text Management
+     * @response 404 {"message":"Project not found","status":404}
+     * @response 403 {"message":"Wrong owner of a project","status":403}
      */
-    public function show(TextsFilter $filter, Project $project, Text $text): AnonymousResourceCollection
+    public function show(TextsFilter $filter, int $project_id, int $text_id): AnonymousResourceCollection
     {
+        $project = Project::where('id', $project_id)->first();
+        $text= Text::where('id', $text_id)->first();
+
+        if(!$project){
+            return $this->error('Project not found', 404);
+        }
+        if(!$text){
+            return $this->error('Text not found', 404);
+        }
+
         $request = new ShowProjectRequest([
             'project_id' => $project->id,
             'user_id' => $project->user_id

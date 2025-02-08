@@ -6,6 +6,7 @@ use App\Http\Requests\V1\ShowProjectRequest;
 use App\Http\Requests\V1\StoreProjectRequest;
 use App\Http\Requests\V1\UpdateProjectRequest;
 use App\Http\Resources\V1\ProjectsResource;
+use App\Models\Permission;
 use App\Models\Project;
 use App\Policies\Api\V1\ProjectPolicy;
 use App\Traits\ApiResponses;
@@ -23,11 +24,22 @@ class ProjectsController extends BaseController
      * @response 200 { "data": { "type": "project", "id": 165, "attributes": { "name": "The project I've created", "created_at": "2025-02-08 02:46:11" }, "relationships": [ { "language": { "type": "language", "id": 3 } } ], "links": { "self": "http://domain.com/api/V1/projects/165" } } }
      * @response 401 {"message": "Unauthenticated."}
      */
-    public function index(): AnonymousResourceCollection
+    public function index(): AnonymousResourceCollection|JsonResponse
     {
-        return ProjectsResource::collection(
-            Project::where('user_id', Auth::user()->id)->paginate()
-        );
+        $user = Auth::user();
+        if($user->tokenCan(Permission::API_V1_SEE_ALL_PROJECTS))
+        {
+            return ProjectsResource::collection(
+                Project::paginate()
+            );
+        }
+        if($user->tokenCan(Permission::API_V1_SEE_OWN_PROJECTS))
+        {
+            return ProjectsResource::collection(
+                Project::where('user_id', Auth::user()->id)->paginate()
+            );
+        }
+        return $this->error('No permissions for this resource', 403);
     }
 
     /**
@@ -41,7 +53,7 @@ class ProjectsController extends BaseController
         $project = new Project();
         if(!$this->authorize(__FUNCTION__, $project))
         {
-            return $this->error('No rights to create a project', 403);
+            return $this->error('No permissions to create a project', 403);
         }
         $project->name = $request->input('data.attributes.name');
         $project->description = $request->input('data.attributes.description');
@@ -67,9 +79,11 @@ class ProjectsController extends BaseController
             return $this->error('Project not found', 404);
         }
 
+
+
         if(!$this->authorize(__FUNCTION__, $project))
         {
-            return $this->error('Wrong owner of a project', 403);
+            return $this->error('No permissions for this resource', 403);
         }
 
         $request = new ShowProjectRequest([
@@ -96,7 +110,7 @@ class ProjectsController extends BaseController
         }
         if(!$this->authorize(__FUNCTION__, $project))
         {
-            return $this->error('Wrong owner of a project', 403);
+            return $this->error('No permissions for this resource', 403);
         }
 
         $project->name = $request->input('data.attributes.name');
@@ -124,7 +138,7 @@ class ProjectsController extends BaseController
 
         if(!$this->authorize(__FUNCTION__, $project))
         {
-            return $this->error('Wrong owner of a project', 403);
+            return $this->error('No permissions for this resource', 403);
 
         }
         if(!$project)
@@ -134,7 +148,7 @@ class ProjectsController extends BaseController
 
         if(!$this->authorize(__FUNCTION__, $project))
         {
-            return $this->error('Wrong owner of a project', 403);
+            return $this->error('No permissions for this resource', 403);
 
         }
         $project->delete();

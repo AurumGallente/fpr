@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Laravel\Sanctum\HasApiTokens;
+use App\Models\Permission;
 
 class User extends Authenticatable
 {
@@ -46,5 +47,35 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function permissions(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(Permission::class, 'permission_user', 'user_id', 'permission_id');
+    }
+
+    /**
+     * @param string $permission
+     * @return bool
+     */
+    public function hasPermission(string $permission): bool
+    {
+        return (bool) $this->permissions()->where('name', $permission)->exists();
+    }
+
+    /**
+     * @return array
+     */
+    public function permissionsToArray(): array
+    {
+        $permissions = [];
+        foreach($this->permissions()->get() as $permission)
+        {
+            $permissions[] = $permission->name;
+        }
+        return $permissions;
     }
 }

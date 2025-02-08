@@ -37,7 +37,9 @@ class AuthController extends Controller
             'Logged in successfully.',
             [
                 'token' => $user
-                    ->createToken('API Token', ['*'], now()->addWeek())
+                    ->createToken('API Token',
+                        $user->permissionsToArray(),
+                        now()->addWeek())
                     ->plainTextToken,
             ]
         );
