@@ -13,6 +13,15 @@ class AuthController extends Controller
 {
     use ApiResponses;
 
+    /**
+     * Authenticates user by email and password, returns bearer token.
+     * @group Authorisation
+     * @unauthenticated
+     * @response 200 {"message": "Logged in successfully.", "status": 200, "data": {"token": "15|9Y7nYKbtXVbRguDRIvg0DIDjQ9Uneg3CF1v0GAg8c45704c3"}}
+     *
+     * @param ApiLoginRequest $request
+     * @return JsonResponse
+     */
     public function login(ApiLoginRequest $request): JsonResponse
     {
         $request->validated($request->all());
@@ -34,6 +43,15 @@ class AuthController extends Controller
         );
     }
 
+    /**
+     * User logout (token expires immediately)
+     * @group Authorisation
+     * @response 200 {"message": "Logged out successfully.","status": 200,"data": []}
+     * @response 401 {"message": "Unauthenticated."}
+     *
+     * @return JsonResponse
+     *
+     */
     public function logout(): JsonResponse
     {
         Auth::user()->currentAccessToken()->delete();

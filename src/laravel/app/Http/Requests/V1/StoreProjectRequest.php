@@ -23,8 +23,12 @@ class StoreProjectRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'data' => ['required', 'array'],
+            'data.attributes' => ['required', 'array'],
             'data.attributes.name' => ['required', 'string', 'max:255'],
             'data.attributes.description' => ['required', 'string', 'min:10', 'max:1000'],
+            'data.attributes.relationships' => ['required', 'array'],
+            'data.attributes.relationships.language' => ['required', 'array'],
             'data.attributes.relationships.language.id' => ['required', 'integer', 'exists:languages,id'],
         ];
     }

@@ -3,3 +3,6 @@
 .env
 .editorconfig
 composer.phar
+.idea/
+laravel-docker.test-key.pem
+laravel-docker.test.pem
