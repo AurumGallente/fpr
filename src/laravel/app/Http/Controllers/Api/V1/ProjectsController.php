@@ -23,6 +23,7 @@ class ProjectsController extends BaseController
      * @group Project Management
      * @response 200 { "data": { "type": "project", "id": 165, "attributes": { "name": "The project I've created", "created_at": "2025-02-08 02:46:11" }, "relationships": [ { "language": { "type": "language", "id": 3 } } ], "links": { "self": "http://domain.com/api/V1/projects/165" } } }
      * @response 401 {"message": "Unauthenticated."}
+     * @response 403 {"message": "No permissions for this resource."}     
      */
     public function index(): AnonymousResourceCollection|JsonResponse
     {
