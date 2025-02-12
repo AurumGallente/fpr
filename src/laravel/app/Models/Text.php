@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Helpers\ReadabilityHelper;
 use App\Http\Filters\Api\V1\QueryFilter;
 use App\Http\Filters\Api\V1\TextsFilter;
 use Illuminate\Database\Eloquent\Model;
@@ -88,16 +89,17 @@ class Text extends Model
      */
     public function chunking(): array
     {
+        $helper = new ReadabilityHelper($this->content, $this->project->language->code);
         $step = round(self::CHUNK_LENGTH/2);
         $chunks = [];
         foreach(explode("\n", $this->content) as $text)
         {
             // remove punctuation
-            $text= preg_replace('/[^\w\s]/', ' ', $text);
+            $text=  preg_replace("#[[:punct:]]#", "", $text);
             // remove extra whitespaces
             $text = preg_replace('/\s+/', ' ', $text);
             // remove diacritics
-            $text = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $text);
+            $text = $helper->remove_accents($text);
             $words = explode(' ', $text);
             $count = count($words);
             if($count > self::CHUNK_LENGTH)
