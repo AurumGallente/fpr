@@ -23,6 +23,9 @@ migrate:
 listen:
 	$(dc) run -it --rm php /var/www/html/artisan queue:listen --timeout=3600
 
+listen_text:
+	$(dc) run -it --rm php /var/www/html/artisan queue:listen --timeout=3600 --queue=text_processing
+
 seed:
 	$(dc) run -it --rm php /var/www/html/artisan db:seed
 

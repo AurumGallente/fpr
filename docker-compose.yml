@@ -99,25 +99,6 @@ services:
         - docker-network
         - docker-testing-network
 
-  artisan:
-    user: "${USERID}:${GROUPID}"
-    build:
-      context: .
-      dockerfile: php.dockerfile
-    volumes:
-      - "./src/laravel:/var/www/html"
-    working_dir: "/var/www/html"
-    depends_on:
-        - db
-        - db_test
-        - php
-    entrypoint: ["php", "/var/www/html/artisan"]
-    networks:
-      - docker-network
-      - docker-testing-network
-    environment:
-        XDEBUG_MODE: coverage
-
 
 volumes:
     db-data:
