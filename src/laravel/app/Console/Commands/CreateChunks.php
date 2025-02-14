@@ -27,7 +27,7 @@ class CreateChunks extends Command
      */
     public function handle()
     {
-        $texts = Text::whereNull('chunks_ids')->get();
+        $texts = Text::all();
 
         foreach ($texts as $text)
         {

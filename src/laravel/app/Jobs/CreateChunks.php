@@ -39,6 +39,8 @@ class CreateChunks implements ShouldQueue
             ]);
             $ids[] = $row->id;
         }
-        $this->text->chunks()->attach($ids)->save();
+        $this->text->chunks()->attach($ids);
+        $this->text->save();
+
     }
 }

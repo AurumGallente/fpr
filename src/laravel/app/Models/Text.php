@@ -7,6 +7,7 @@ use App\Http\Filters\Api\V1\QueryFilter;
 use App\Http\Filters\Api\V1\TextsFilter;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\Project;
@@ -19,7 +20,6 @@ use StdClass;
 class Text extends Model
 {
     use SoftDeletes;
-    use \Staudenmeir\EloquentJsonRelations\HasJsonRelationships;
 
     /**
      * @var string
@@ -38,7 +38,7 @@ class Text extends Model
     ];
 
     protected $casts = [
-        'chunks_ids' => 'json',
+        'chunks_ids' => 'array',
     ];
 
     const CHUNK_LENGTH = 5;
@@ -60,11 +60,11 @@ class Text extends Model
     }
 
     /**
-     * @return \Staudenmeir\EloquentJsonRelations\Relations\BelongsToJson
+     * @return BelongsToMany
      */
-    public function chunks(): \Staudenmeir\EloquentJsonRelations\Relations\BelongsToJson
+    public function chunks(): BelongsToMany
     {
-        return $this->belongsToJson(Chunk::class, 'chunks_ids');
+        return $this->belongsToMany(Chunk::class, 'chunk_text', 'text_id', 'chunk_id');
     }
 
 

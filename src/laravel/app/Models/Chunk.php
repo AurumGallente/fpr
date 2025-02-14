@@ -3,14 +3,15 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use \Staudenmeir\EloquentJsonRelations\HasJsonRelationships;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use App\Models\Text;
 
 class Chunk extends Model
 {
-    use \Staudenmeir\EloquentJsonRelations\HasJsonRelationships;
 
     protected $table = 'chunks';
+
+    public $timestamps = false;
 
     /**
      * @var string[]
@@ -21,10 +22,10 @@ class Chunk extends Model
     ];
 
     /**
-     * @return \Staudenmeir\EloquentJsonRelations\Relations\HasManyJson
+     * @return BelongsToMany
      */
-    public function texts(): \Staudenmeir\EloquentJsonRelations\Relations\HasManyJson
+    public function texts(): BelongsToMany
     {
-        return $this->hasManyJson(Text::class, 'chunks_ids');
+        return $this->belongsToMany(Text::class, 'chunk_text', 'chunk_id', 'text_id');
     }
 }
