@@ -79,6 +79,7 @@ services:
       XDEBUG_MODE: coverage
 
   composer:
+    user: "${USERID}:${GROUPID}"
     build:
       context: .
       dockerfile: composer.dockerfile
