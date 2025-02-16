@@ -9,6 +9,7 @@ use Facebook\WebDriver\Remote\RemoteWebDriver;
 use Illuminate\Support\Collection;
 use Laravel\Dusk\TestCase as BaseTestCase;
 use PHPUnit\Framework\Attributes\BeforeClass;
+use App\Models\User;
 
 abstract class DuskTestCase extends BaseTestCase
 {
@@ -18,9 +19,14 @@ abstract class DuskTestCase extends BaseTestCase
     #[BeforeClass]
     public static function prepare(): void
     {
-//        if (! static::runningInSail()) {
-//            static::startChromeDriver(['--port=9515']);
-//        }
+
+    }
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->artisan('migrate');
+
     }
 
     /**
@@ -28,16 +34,15 @@ abstract class DuskTestCase extends BaseTestCase
      */
     protected function driver(): RemoteWebDriver
     {
-        $options = (new ChromeOptions)->addArguments(collect([
-            $this->shouldStartMaximized() ? '--start-maximized' : '--window-size=1920,1080',
-            '--disable-search-engine-choice-screen',
-        ])->unless($this->hasHeadlessDisabled(), function (Collection $items) {
+        $options = (new ChromeOptions)->addArguments(collect([])
+            ->unless($this->hasHeadlessDisabled(), function (Collection $items) {
             return $items->merge([
                 '--disable-gpu',
                 '--headless=new',
                 '--whitelisted-ips=""',
                 '--disable-dev-shm-usage',
-                ''
+                '--disable-search-engine-choice-screen',
+                '--start-maximized'
             ]);
         })->all());
 

@@ -35,10 +35,10 @@ services:
   db_test:
       image: bitnami/postgresql:16.3.0
       platform: linux/amd64
-      shm_size: 64mb
+      shm_size: 128mb
       ports:
           - "${POSTGRES_TEST_OUTER_PORT}:${POSTGRES_TEST_INNER_PORT}"
-      restart: unless-stopped
+      restart: always
       volumes:
           - db-data2:/bitnami/postgresql
       environment:
@@ -103,6 +103,7 @@ services:
 
   chrome:
     image: selenium/standalone-chrome
+    shm_size: 2g
     container_name: chrome_container
     ports:
       - "4444:4444"
