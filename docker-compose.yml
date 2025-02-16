@@ -1,5 +1,6 @@
 services:
   nginx:
+    container_name: app_container
     build:
       context: .
       dockerfile: nginx.dockerfile
@@ -99,6 +100,16 @@ services:
     networks:
         - docker-network
         - docker-testing-network
+
+  chrome:
+    image: selenium/standalone-chrome
+    container_name: chrome_container
+    ports:
+      - "4444:4444"
+    volumes:
+      - /dev/shm:/dev/shm
+    networks:
+      - docker-testing-network
 
 
 volumes:

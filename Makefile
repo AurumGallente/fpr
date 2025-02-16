@@ -37,3 +37,6 @@ docs:
 
 npm_b:
 	$(dc) run --rm npm run build
+
+dusk:
+	$(dc) run -it --rm php /var/www/html/artisan dusk

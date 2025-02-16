@@ -3,6 +3,7 @@
 namespace Tests;
 
 use Facebook\WebDriver\Chrome\ChromeOptions;
+use Facebook\WebDriver\Firefox\FirefoxOptions;
 use Facebook\WebDriver\Remote\DesiredCapabilities;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
 use Illuminate\Support\Collection;
@@ -17,9 +18,9 @@ abstract class DuskTestCase extends BaseTestCase
     #[BeforeClass]
     public static function prepare(): void
     {
-        if (! static::runningInSail()) {
-            static::startChromeDriver(['--port=9515']);
-        }
+//        if (! static::runningInSail()) {
+//            static::startChromeDriver(['--port=9515']);
+//        }
     }
 
     /**
@@ -34,14 +35,17 @@ abstract class DuskTestCase extends BaseTestCase
             return $items->merge([
                 '--disable-gpu',
                 '--headless=new',
+                '--whitelisted-ips=""',
+                '--disable-dev-shm-usage',
+                ''
             ]);
         })->all());
 
+
         return RemoteWebDriver::create(
-            $_ENV['DUSK_DRIVER_URL'] ?? env('DUSK_DRIVER_URL') ?? 'http://localhost:9515',
-            DesiredCapabilities::chrome()->setCapability(
-                ChromeOptions::CAPABILITY, $options
-            )
+            'http://chrome_container:4444/wd/hub',
+            DesiredCapabilities::chrome()
+                ->setCapability(ChromeOptions::CAPABILITY, $options)
         );
     }
 }
