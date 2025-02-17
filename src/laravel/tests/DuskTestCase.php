@@ -32,6 +32,9 @@ abstract class DuskTestCase extends BaseTestCase
         parent::setUp();
         $this->artisan('migrate');
         $this->basicPassword = env('DUSK_DEFAULT_USER_PASSWORD');
+        foreach (static::$browsers as $browser) {
+            $browser->driver->manage()->deleteAllCookies();
+        }
 
     }
 

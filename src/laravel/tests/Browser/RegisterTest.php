@@ -6,7 +6,6 @@ use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Laravel\Dusk\Browser;
 use Tests\Browser\Pages\Register;
 use Tests\DuskTestCase;
-use Illuminate\Routing\Route;
 use Faker\Factory as Faker;
 use App\Models\User;
 
