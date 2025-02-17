@@ -13,6 +13,11 @@ use App\Models\User;
 
 abstract class DuskTestCase extends BaseTestCase
 {
+
+    /**
+     * @var string
+     */
+    public string $basicPassword = '';
     /**
      * Prepare for Dusk test execution.
      */
@@ -26,29 +31,31 @@ abstract class DuskTestCase extends BaseTestCase
     {
         parent::setUp();
         $this->artisan('migrate');
+        $this->basicPassword = env('DUSK_DEFAULT_USER_PASSWORD');
 
     }
+
 
     /**
      * Create the RemoteWebDriver instance.
      */
     protected function driver(): RemoteWebDriver
     {
-        $options = (new ChromeOptions)->addArguments(collect([])
-            ->unless($this->hasHeadlessDisabled(), function (Collection $items) {
+        $options = (new ChromeOptions)->addArguments(collect([
+            $this->shouldStartMaximized() ? '--start-maximized' : '--window-size=1920,1080',
+            '--disable-search-engine-choice-screen',
+        ])->unless($this->hasHeadlessDisabled(), function (Collection $items) {
             return $items->merge([
                 '--disable-gpu',
                 '--headless=new',
                 '--whitelisted-ips=""',
                 '--disable-dev-shm-usage',
-                '--disable-search-engine-choice-screen',
-                '--start-maximized'
             ]);
         })->all());
 
 
         return RemoteWebDriver::create(
-            'http://chrome_container:4444/wd/hub',
+            env('DUSK_SERVER_URL'),
             DesiredCapabilities::chrome()
                 ->setCapability(ChromeOptions::CAPABILITY, $options)
         );
