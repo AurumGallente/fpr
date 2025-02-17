@@ -16,7 +16,8 @@ class RegisterTest extends DuskTestCase
      */
     public function testRegister(): void
     {
-        $this->browse(function (Browser $browser) {
+        $email = '';
+        $this->browse(function (Browser $browser) use (&$email) {
             $faker = Faker::create();
             $name = $faker->name;
             $password = $this->basicPassword;
@@ -30,5 +31,9 @@ class RegisterTest extends DuskTestCase
                 ->click('@submit')
                 ->assertRouteIs('dashboard');
         });
+        $user = User::where('email', $email)->first();
+        // Check if UserObserver created permissions for a new user
+        $this->assertDatabaseHas('permission_user', ['user_id' => $user->id]);
     }
+
 }
