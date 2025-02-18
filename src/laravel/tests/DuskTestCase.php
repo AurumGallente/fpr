@@ -3,10 +3,11 @@
 namespace Tests;
 
 use Facebook\WebDriver\Chrome\ChromeOptions;
-use Facebook\WebDriver\Firefox\FirefoxOptions;
 use Facebook\WebDriver\Remote\DesiredCapabilities;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
+use Faker\Factory as Faker;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Hash;
 use Laravel\Dusk\TestCase as BaseTestCase;
 use PHPUnit\Framework\Attributes\BeforeClass;
 use App\Models\User;
@@ -18,6 +19,12 @@ abstract class DuskTestCase extends BaseTestCase
      * @var string
      */
     public string $basicPassword = '';
+
+    /**
+     * @var User
+     */
+    public User $user;
+
     /**
      * Prepare for Dusk test execution.
      */
@@ -31,11 +38,37 @@ abstract class DuskTestCase extends BaseTestCase
     {
         parent::setUp();
         $this->artisan('migrate');
-        $this->basicPassword = env('DUSK_DEFAULT_USER_PASSWORD');
         foreach (static::$browsers as $browser) {
             $browser->driver->manage()->deleteAllCookies();
         }
 
+        $faker = Faker::create();
+        $this->basicPassword = env('DUSK_DEFAULT_USER_PASSWORD') ?: $faker->password(8);
+
+        if(env('DUSK_DEFAULT_ACTOR'))
+        {
+            $user = User::where('email', '=', env('DUSK_DEFAULT_ACTOR'))->first();
+            if(!$user)
+            {
+                $user = User::create([
+                    'name' => $faker->name(),
+                    'email' => env('DUSK_DEFAULT_ACTOR'),
+                    'password' => Hash::make(env('DUSK_DEFAULT_USER_PASSWORD') ?: $faker->password(10)),
+                ]);
+            }
+        } else
+        {
+            do {
+                $email = $faker->unique()->safeEmail;
+                $user = User::where('email', $email)->first();
+            } while($user);
+            $user = User::create([
+                'name' => $faker->name(),
+                'email' => $email,
+                'password' => Hash::make(env('DUSK_DEFAULT_USER_PASSWORD') ?: $faker->password(10)),
+            ]);
+        }
+        $this->user = $user;
     }
 
 

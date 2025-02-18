@@ -48,23 +48,6 @@ services:
       networks:
           - docker-testing-network
 
-  pgadmin:
-    image: dpage/pgadmin4
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@admin.com
-      PGADMIN_DEFAULT_PASSWORD: secret
-    volumes:
-      - db-data:/bitnami/postgresql
-      - db-data2:/bitnami/postgresql
-    ports:
-      - "${PGADMIN_OUTER_PORT}:${PGADMIN_INNER_PORT}"
-    depends_on:
-      - db
-    networks:
-      - docker-network
-      - docker-testing-network
-
-
   php:
     user: "${USERID}:${GROUPID}"
     build:
@@ -97,6 +80,9 @@ services:
         - "./src/laravel:/var/www/html"
     entrypoint: ["npm"]
     working_dir: "/var/www/html"
+    depends_on:
+      - php
+      - nginx
     networks:
         - docker-network
         - docker-testing-network
@@ -109,6 +95,9 @@ services:
       - "4444:4444"
     volumes:
       - /dev/shm:/dev/shm
+    depends_on:
+      - php
+      - nginx
     networks:
       - docker-testing-network
 
