@@ -8,9 +8,11 @@ use Facebook\WebDriver\Remote\RemoteWebDriver;
 use Faker\Factory as Faker;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Hash;
+use Laravel\Dusk\Browser;
 use Laravel\Dusk\TestCase as BaseTestCase;
 use PHPUnit\Framework\Attributes\BeforeClass;
 use App\Models\User;
+use Tests\Browser\Pages\Login;
 
 abstract class DuskTestCase extends BaseTestCase
 {
@@ -95,5 +97,18 @@ abstract class DuskTestCase extends BaseTestCase
             DesiredCapabilities::chrome()
                 ->setCapability(ChromeOptions::CAPABILITY, $options)
         );
+    }
+
+    /**
+     * @param Browser $browser
+     * @return Browser
+     */
+    protected function loginUser(Browser $browser): Browser
+    {
+        $browser->visit(new Login)
+            ->fillInLoginForm($this->user->email, $this->basicPassword)
+            ->click('@submit');
+
+        return $browser;
     }
 }

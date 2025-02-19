@@ -8,8 +8,10 @@ use Tests\DuskTestCase;
 
 class LoginTest extends DuskTestCase
 {
+
     /**
-     * A Dusk test example.
+     * @return void
+     * @throws \Throwable
      */
     public function testLogin(): void
     {

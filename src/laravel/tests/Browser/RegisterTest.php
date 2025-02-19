@@ -11,14 +11,16 @@ use App\Models\User;
 
 class RegisterTest extends DuskTestCase
 {
+
     /**
-     * A Dusk test example.
+     * @return void
+     * @throws \Throwable
      */
     public function testRegister(): void
     {
         $email = '';
-        $this->browse(function (Browser $browser) use (&$email) {
-            $faker = Faker::create();
+        $faker = Faker::create();
+        $this->browse(function (Browser $browser) use (&$email, $faker) {
             $name = $faker->name;
             $password = $this->basicPassword;
             do {

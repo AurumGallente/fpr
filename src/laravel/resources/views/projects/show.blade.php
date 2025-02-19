@@ -14,12 +14,12 @@
         <hr class="hr-blurry " />
         <div class="row">
             <div class="col-span-12">
-                <a href="{{route('projects.edit', $project->id)}}" class="card-link btn btn-warning col-span-2">Edit</a>
+                <a href="{{route('projects.edit', $project->id)}}" dusk="edit{{$project->id}}" class="card-link btn btn-warning col-span-2">Edit</a>
 
                 <form class="form-check-inline" method="POST" action="{{route('projects.destroy', $project->id)}}">
                     @csrf
                     @method('DELETE')
-                    <a class="card-link btn btn-danger col-span-2" href="{{route('projects.destroy', $project->id)}}"
+                    <a dusk="delete" class="card-link btn btn-danger col-span-2" href="{{route('projects.destroy', $project->id)}}"
                        onclick="event.preventDefault();
                                             this.closest('form').submit();">
                         Delete
