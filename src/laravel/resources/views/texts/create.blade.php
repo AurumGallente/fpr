@@ -23,12 +23,12 @@
                 @method('POST')
                 <div class="form-group">
                     <label for="content">Content:</label>
-                    <textarea class="form-control" id="content" name="content" rows="12" required>{{old('content')}}</textarea>
+                    <textarea dusk="content" class="form-control" id="content" name="content" rows="12" required>{{old('content')}}</textarea>
                     <x-input-error :messages="$errors->get('content')" class="mt-2" />
                 </div>
                 <br>
                 <div class="form-group">
-                    <button type="submit" class="input-group-addon btn btn-primary">Submit</button>
+                    <button dusk="submit" type="submit" class="input-group-addon btn btn-primary">Submit</button>
                 </div>
             </form>
         </div>

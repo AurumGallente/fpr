@@ -36,14 +36,14 @@
                 @endif
             </p>
             <p>
-                <a href="{{route('projects.texts.create', ['id' => $project->id])}}">Create new text</a>
+                <a dusk="create_text" href="{{route('projects.texts.create', ['id' => $project->id])}}">Create new text</a>
             </p>
             <div class="card-deck">
                 @foreach($texts as $text)
                     <div class="">
                         <div class="card m-1 w-100" style="width: 20rem;">
                             <div class="card-body">
-                                <a class="card-title" href="{{route('texts.show', ['id'=>$text->id])}}">Version {{$text->version}}</a>
+                                <a dusk="text_{{$text->id}}" class="card-title" href="{{route('texts.show', ['id'=>$text->id])}}">Version {{$text->version}}</a>
                                 <p class="card-text italic">{{\Str::of($text->content)->words(30)}}</p>
                             </div>
                             <div class="card-footer">

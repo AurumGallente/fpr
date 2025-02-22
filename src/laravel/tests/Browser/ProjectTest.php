@@ -18,7 +18,7 @@ class ProjectTest extends DuskTestCase
     public function testCreate(): void
     {
         $namePrefix = 'test_cr ';
-        $data = $this->createTestForFurtherTesting($namePrefix);
+        $data = $this->createProjectForFurtherTesting($namePrefix);
 
         $this->assertDatabaseHas('projects', ['name' => $data['name'], 'description' => $data['description']]);
     }
@@ -30,7 +30,7 @@ class ProjectTest extends DuskTestCase
     public function testUpdate(): void
     {
         $namePrefix = 'test_upd ';
-        $data = $this->createTestForFurtherTesting($namePrefix);
+        $data = $this->createProjectForFurtherTesting($namePrefix);
         $project = \App\Models\Project::where('name', '=', $data['name'])->orderBy('id', 'desc')->first();
         $this->browse(function (Browser $browser) use ($project) {
             $browser->click('@edit'.$project->id)
@@ -52,7 +52,7 @@ class ProjectTest extends DuskTestCase
     public function testDelete(): void
     {
         $namePrefix = 'test_del ';
-        $data = $this->createTestForFurtherTesting($namePrefix);
+        $data = $this->createProjectForFurtherTesting($namePrefix);
         $project = \App\Models\Project::where('name', '=', $data['name'])->orderBy('id', 'desc')->first();
         $this->browse(function (Browser $browser) use ($project) {
             $browser->click('@edit'.$project->id)
@@ -69,7 +69,7 @@ class ProjectTest extends DuskTestCase
      * @return array
      * @throws \Throwable
      */
-    private function createTestForFurtherTesting(string $namePrefix): array
+    protected function createProjectForFurtherTesting(string $namePrefix): array
     {
         $faker = Faker::create();
         $name = $namePrefix. $faker->words(2, true);
