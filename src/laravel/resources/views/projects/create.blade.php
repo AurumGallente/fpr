@@ -7,13 +7,13 @@
                 <!-- Name -->
                 <div class="form-group">
                     <x-input-label for="name" :value="__('Name')" />
-                    <x-text-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" />
+                    <x-text-input id="name" dusk="name" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" />
                     <x-input-error :messages="$errors->get('name')" class="mt-2" />
                 </div>
 
                 <div class="form-group">
                     <label for="language_id">Select language</label>
-                    <select class="form-control" name="language_id">
+                    <select dusk="language_id" class="form-control" name="language_id">
                         @foreach ($languages as $language)
                             <option value="{{$language->id}}" {{old('$language->id')==$language->id ? 'selected' : ''}}>{{$language->language}}</option>
                         @endforeach
@@ -23,12 +23,12 @@
 
                 <div class="form-group">
                     <label for="description">Description</label>
-                    <textarea name="description" class="form-control" id="description" rows="12" required>{{old('description')}}</textarea>
+                    <textarea name="description" dusk="description" class="form-control" id="description" rows="12" required>{{old('description')}}</textarea>
                     <x-input-error :messages="$errors->get('description')" class="mt-2" />
                 </div>
                 <div class=""></div>
                 <div class="form-group">
-                    <button type="submit" class="btn btn-primary">
+                    <button type="submit" dusk="submit" class="btn btn-primary">
                         {{ __('Create') }}
                     </button>
                 </div>

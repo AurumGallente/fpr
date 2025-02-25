@@ -14,12 +14,12 @@
         <hr class="hr-blurry " />
         <div class="row">
             <div class="col-span-12">
-                <a href="{{route('projects.edit', $project->id)}}" class="card-link btn btn-warning col-span-2">Edit</a>
+                <a href="{{route('projects.edit', $project->id)}}" dusk="edit{{$project->id}}" class="card-link btn btn-warning col-span-2">Edit</a>
 
                 <form class="form-check-inline" method="POST" action="{{route('projects.destroy', $project->id)}}">
                     @csrf
                     @method('DELETE')
-                    <a class="card-link btn btn-danger col-span-2" href="{{route('projects.destroy', $project->id)}}"
+                    <a dusk="delete" class="card-link btn btn-danger col-span-2" href="{{route('projects.destroy', $project->id)}}"
                        onclick="event.preventDefault();
                                             this.closest('form').submit();">
                         Delete
@@ -36,14 +36,14 @@
                 @endif
             </p>
             <p>
-                <a href="{{route('projects.texts.create', ['id' => $project->id])}}">Create new text</a>
+                <a dusk="create_text" href="{{route('projects.texts.create', ['id' => $project->id])}}">Create new text</a>
             </p>
             <div class="card-deck">
                 @foreach($texts as $text)
                     <div class="">
                         <div class="card m-1 w-100" style="width: 20rem;">
                             <div class="card-body">
-                                <a class="card-title" href="{{route('texts.show', ['id'=>$text->id])}}">Version {{$text->version}}</a>
+                                <a dusk="text_{{$text->id}}" class="card-title" href="{{route('texts.show', ['id'=>$text->id])}}">Version {{$text->version}}</a>
                                 <p class="card-text italic">{{\Str::of($text->content)->words(30)}}</p>
                             </div>
                             <div class="card-footer">

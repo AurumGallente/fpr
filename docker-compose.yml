@@ -1,5 +1,6 @@
 services:
   nginx:
+    container_name: app_container
     build:
       context: .
       dockerfile: nginx.dockerfile
@@ -18,7 +19,7 @@ services:
   db:
       image: bitnami/postgresql:16.3.0
       platform: linux/amd64
-      shm_size: 256mb
+      shm_size: 512mb
       ports:
           - "${POSTGRES_OUTER_PORT}:${POSTGRES_INNER_PORT}"
       restart: always
@@ -34,10 +35,10 @@ services:
   db_test:
       image: bitnami/postgresql:16.3.0
       platform: linux/amd64
-      shm_size: 64mb
+      shm_size: 128mb
       ports:
           - "${POSTGRES_TEST_OUTER_PORT}:${POSTGRES_TEST_INNER_PORT}"
-      restart: unless-stopped
+      restart: always
       volumes:
           - db-data2:/bitnami/postgresql
       environment:
@@ -46,23 +47,6 @@ services:
           - POSTGRES_PASSWORD=${DB_TEST_PASSWORD}
       networks:
           - docker-testing-network
-
-  pgadmin:
-    image: dpage/pgadmin4
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@admin.com
-      PGADMIN_DEFAULT_PASSWORD: secret
-    volumes:
-      - db-data:/bitnami/postgresql
-      - db-data2:/bitnami/postgresql
-    ports:
-      - "${PGADMIN_OUTER_PORT}:${PGADMIN_INNER_PORT}"
-    depends_on:
-      - db
-    networks:
-      - docker-network
-      - docker-testing-network
-
 
   php:
     user: "${USERID}:${GROUPID}"
@@ -79,6 +63,7 @@ services:
       XDEBUG_MODE: coverage
 
   composer:
+    user: "${USERID}:${GROUPID}"
     build:
       context: .
       dockerfile: composer.dockerfile
@@ -95,9 +80,28 @@ services:
         - "./src/laravel:/var/www/html"
     entrypoint: ["npm"]
     working_dir: "/var/www/html"
+    depends_on:
+      - php
+      - nginx
     networks:
         - docker-network
         - docker-testing-network
+
+  chrome:
+    image: selenium/standalone-chromium:latest
+    shm_size: 2g
+    container_name: chrome_container
+    ports:
+      - "4444:4444"
+      - "5900:5900"
+      - "7900:7900"
+    volumes:
+      - /dev/shm:/dev/shm
+    depends_on:
+      - php
+      - nginx
+    networks:
+      - docker-testing-network
 
 
 volumes:
