@@ -6,6 +6,7 @@ watch_url='http://localhost:7900/?autoconnect=1&resize=scale&password=secret'
 install:
 	cp .env.example .env && \
 	cp src/laravel/.env.example src/laravel/.env && \
+	cp src/laravel/.env.dusk.local.example src/laravel/.env.dusk.local && \
 	$(dc) -f docker-compose.yml up --build --detach && \
 	cd src/laravel && \
 	$(dc) run -it --rm composer install && \
