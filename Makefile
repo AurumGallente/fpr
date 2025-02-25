@@ -1,6 +1,7 @@
 -include .env
 d=docker
 dc=docker compose
+watch_url='http://localhost:7900/?autoconnect=1&resize=scale&password=secret'
 
 up_d:
 	$(dc) -f docker-compose.yml up --detach
@@ -39,4 +40,10 @@ npm_b:
 	$(dc) run --rm npm run build
 
 dusk:
+	  @case "$$(uname)" in \
+		Linux) xdg-open $(watch_url) ;; \
+		Darwin) open $(watch_url) ;; \
+		CYGWIN*|MINGW*) start $(watch_url) ;; \
+		*) echo "Unsupported OS: $$(uname)" ;; \
+	  esac
 	$(dc) run -it --rm php /var/www/html/artisan dusk

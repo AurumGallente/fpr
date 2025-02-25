@@ -88,11 +88,13 @@ services:
         - docker-testing-network
 
   chrome:
-    image: selenium/standalone-chrome
+    image: selenium/standalone-chromium:latest
     shm_size: 2g
     container_name: chrome_container
     ports:
       - "4444:4444"
+      - "5900:5900"
+      - "7900:7900"
     volumes:
       - /dev/shm:/dev/shm
     depends_on:
