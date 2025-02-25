@@ -26,7 +26,7 @@ class TextSeeder extends Seeder
 
         $langMap = FakerHelper::$map;
 
-        for($i=1; $i<=300; $i++)
+        for($i=1; $i<=100; $i++)
         {
             $project = $projects->random();
             $language = $project->language;
