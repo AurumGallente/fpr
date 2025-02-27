@@ -64,3 +64,6 @@ dusk:
 		*) echo "Unsupported OS: $$(uname)" ;; \
 	  esac
 	$(dc) run -it --rm php /var/www/html/artisan dusk
+
+es_index_create:
+	$(dc) run -it --rm php /var/www/html/artisan es:create-index

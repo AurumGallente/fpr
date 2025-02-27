@@ -37,10 +37,6 @@ class Text extends Model
         'metrics',
     ];
 
-    protected $casts = [
-        'chunks_ids' => 'array',
-    ];
-
     const CHUNK_LENGTH = 5;
 
     /**

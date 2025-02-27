@@ -5,6 +5,7 @@ namespace App\Observers;
 use App\Jobs\CreateChunks;
 use App\Jobs\ProcessReadability;
 use App\Jobs\ProcessWordCount;
+use App\Jobs\PutTextToES;
 use App\Models\Text;
 
 class TextObserver
@@ -17,6 +18,7 @@ class TextObserver
         ProcessWordCount::dispatch($text)->onQueue('text_processing');
         ProcessReadability::dispatch($text)->onQueue('text_processing');
         CreateChunks::dispatch($text)->onQueue('text_processing');
+        PutTextToES::dispatch($text)->onQueue('text_processing');
     }
 
     /**

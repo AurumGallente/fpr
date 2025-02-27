@@ -40,7 +40,7 @@ class ProjectSeeder extends Seeder
             'tr' => 'tr_TR',
         ];
 
-        for($i=1; $i<=30; $i++)
+        for($i=1; $i<=20; $i++)
         {
             $language = $languages->random();
             $locale = $langMap[$language->code];
