@@ -16,6 +16,7 @@ install:
 	$(dc) run -it --rm php /var/www/html/artisan db:seed && \
 	$(dc) run -it --rm php /var/www/html/artisan app:count-words && \
 	$(dc) run -it --rm php /var/www/html/artisan app:count-readability &&\
+	$(dc) run -it --rm php /var/www/html/artisan es:create-index &&\
 	$(dc) run -it --rm --detach php /var/www/html/artisan queue:listen --timeout=3600 --queue=text_processing
 
 
