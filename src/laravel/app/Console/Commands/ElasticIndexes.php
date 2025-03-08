@@ -8,6 +8,7 @@ use PDPhilip\Elasticsearch\Schema\Schema;
 use PDPhilip\Elasticsearch\Schema\IndexBlueprint;
 use PDPhilip\Elasticsearch\Schema\AnalyzerBlueprint;
 use Illuminate\Support\Facades\Http;
+use Elastic\Elasticsearch\ClientBuilder;
 
 class ElasticIndexes extends Command
 {
@@ -32,6 +33,32 @@ class ElasticIndexes extends Command
     {
         $output = new \Symfony\Component\Console\Output\ConsoleOutput();
 
+
+        $array = [
+            'cs_text_index'=>'czech',
+            'da_text_index'=>'danish',
+            'nl_text_index'=>'dutch',
+            'en_text_index'=>'english',
+            'et_text_index'=>'estonian',
+            'fi_text_index'=>'finnish',
+            'de_text_index'=>'german',
+            'fr_text_index'=>'french',
+            'el_text_index'=>'greek',
+            'it_text_index'=>'italian',
+            'no_text_index'=>'norwegian',
+            'pl_text_index'=>'standard',
+            'pt_text_index'=>'portuguese',
+            'sl_text_index'=>'standard',
+            'es_text_index'=>'spanish',
+            'tr_text_index'=>'turkish',
+            'ru_text_index'=>'russian'
+        ];
+
+        if(!env('ES_HOSTS')){
+            $output->writeln("<info>ES is not configured. Aborting.</info>");
+            return;
+        }
+
         do {
             $output->writeln("<info>Check if ES is ready to accept requests...</info>");
             $response = Http::get(env('ES_HOSTS'));
@@ -40,100 +67,21 @@ class ElasticIndexes extends Command
 
         $output->writeln("<info>It is ready.</info>");
 
-        Schema::createIfNotExists('cs_text_index', function (IndexBlueprint $index) {
-            $index->integer('external_id');
-            $index->text('content')->analyzer('czech');
-            $index->date('created_at');
-        });
-        $output->writeln("<info>czech index created.</info>");
-        Schema::createIfNotExists('da_text_index', function (IndexBlueprint $index) {
-            $index->integer('external_id');
-            $index->text('content')->analyzer('danish');
-            $index->date('created_at');
-        });
-        $output->writeln("<info>dutch index created.</info>");
-        Schema::createIfNotExists('nl_text_index', function (IndexBlueprint $index) {
-            $index->integer('external_id');
-            $index->text('content')->analyzer('dutch');
-            $index->date('created_at');
-        });
-        $output->writeln("<info>english index created.</info>");
-        Schema::createIfNotExists('en_text_index', function (IndexBlueprint $index) {
-            $index->integer('external_id');
-            $index->text('content')->analyzer('english');
-            $index->date('created_at');
-        });
-        $output->writeln("<info>estonian index created.</info>");
-        Schema::createIfNotExists('et_text_index', function (IndexBlueprint $index) {
-            $index->integer('external_id');
-            $index->text('content')->analyzer('estonian');
-            $index->date('created_at');
-        });
-        $output->writeln("<info>finnish index created.</info>");
-        Schema::createIfNotExists('fi_text_index', function (IndexBlueprint $index) {
-            $index->integer('external_id');
-            $index->text('content')->analyzer('finnish');
-            $index->date('created_at');
-        });
-        $output->writeln("<info>french index created.</info>");
-        Schema::createIfNotExists('fr_text_index', function (IndexBlueprint $index) {
-            $index->integer('external_id');
-            $index->text('content')->analyzer('french');
-            $index->date('created_at');
-        });
-        $output->writeln("<info>german index created.</info>");
-        Schema::createIfNotExists('de_text_index', function (IndexBlueprint $index) {
-            $index->integer('external_id');
-            $index->text('content')->analyzer('german');
-            $index->date('created_at');
-        });
-        $output->writeln("<info>greek index created.</info>");
-        Schema::createIfNotExists('el_text_index', function (IndexBlueprint $index) {
-            $index->integer('external_id');
-            $index->text('content')->analyzer('greek');
-            $index->date('created_at');
-        });
-        $output->writeln("<info>italian index created.</info>");
-        Schema::createIfNotExists('it_text_index', function (IndexBlueprint $index) {
-            $index->integer('external_id');
-            $index->text('content')->analyzer('italian');
-            $index->date('created_at');
-        });
-        $output->writeln("<info>norwegian index created.</info>");
-        Schema::createIfNotExists('no_text_index', function (IndexBlueprint $index) {
-            $index->integer('external_id');
-            $index->text('content')->analyzer('norwegian');
-            $index->date('created_at');
-        });
-        $output->writeln("<info>polish (standard) index created.</info>");
-        Schema::createIfNotExists('pl_text_index', function (IndexBlueprint $index) {
-            $index->integer('external_id');
-            $index->text('content')->analyzer('standard');
-            $index->date('created_at');
-        });
-        $output->writeln("<info>portuguese index created.</info>");
-        Schema::createIfNotExists('pt_text_index', function (IndexBlueprint $index) {
-            $index->integer('external_id');
-            $index->text('content')->analyzer('portuguese');
-            $index->date('created_at');
-        });
-        $output->writeln("<info>slovene (standard) index created.</info>");
-        Schema::createIfNotExists('sl_text_index', function (IndexBlueprint $index) {
-            $index->integer('external_id');
-            $index->text('content')->analyzer('standard');
-            $index->date('created_at');
-        });
-        $output->writeln("<info>spanish index created.</info>");
-        Schema::createIfNotExists('es_text_index', function (IndexBlueprint $index) {
-            $index->integer('external_id');
-            $index->text('content')->analyzer('spanish');
-            $index->date('created_at');
-        });
-        $output->writeln("<info>turkish index created.</info>");
-        Schema::createIfNotExists('tr_text_index', function (IndexBlueprint $index) {
-            $index->integer('external_id');
-            $index->text('content')->analyzer('turkish');
-            $index->date('created_at');
-        });
+        $shards = env('ES_NUMBER_OF_SHARDS_PER_INDEX');
+        $replicas = env('ES_NUMBER_OF_REPLICAS_PER_INDEX');
+
+        foreach($array as $key => $analyzer)
+        {
+            Schema::createIfNotExists($key, static function (IndexBlueprint $index) use ($analyzer, $shards, $replicas) {
+                $index->settings('number_of_shards', $shards);
+                $index->settings('number_of_replicas', $replicas);
+                $index->integer('external_id');
+                $index->integer('project_id');
+                $index->text('content')->analyzer($analyzer);
+                $index->text('normalized_content')->analyzer($analyzer);
+                $index->date('created_at');
+            });
+            $output->writeln("<info>$analyzer index created.</info>");
+        }
     }
 }

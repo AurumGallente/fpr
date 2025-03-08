@@ -57,6 +57,9 @@ npm_b:
 	$(dc) run --rm npm run build
 
 dusk:
+	$(dc) run -it --rm php /var/www/html/artisan dusk
+
+dusk_head:
 	  @case "$$(uname)" in \
 		Linux) command -v xdg-open >/dev/null && xdg-open $(watch_url) || echo "No browser available"; ;; \
 		Darwin) command -v open >/dev/null && open $(watch_url) || echo "No browser available"; ;; \

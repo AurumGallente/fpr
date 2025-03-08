@@ -67,6 +67,7 @@ class TextsController extends Controller implements HasMiddleware
     public function show(Request $request): View
     {
         $text = Text::find($request->id);
+        //dd($text->EStext()->first()->findSimilarByChunks($text->chunks()->get()));
         return view('texts.show', ['text' => $text]);
     }
 

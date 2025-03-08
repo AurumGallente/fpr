@@ -25,6 +25,7 @@ services:
       restart: always
       volumes:
           - db-data:/bitnami/postgresql
+          - ./init-db:/docker-entrypoint-initdb.d
       environment:
           - POSTGRES_DATABASE=${POSTGRES_DATABASE}
           - POSTGRES_USERNAME=${POSTGRES_USERNAME}
@@ -41,6 +42,7 @@ services:
       restart: always
       volumes:
           - db-data2:/bitnami/postgresql
+          - ./init-db:/docker-entrypoint-initdb.d
       environment:
           - POSTGRES_DATABASE=${DB_TEST_DATABASE}
           - POSTGRES_USERNAME=${DB_TEST_USERNAME}
@@ -115,12 +117,13 @@ services:
       - discovery.type=single-node
       - xpack.security.enabled=false
       - xpack.security.enrollment.enabled=false
-    deploy:
-      resources:
-        limits:
-          memory: 2g
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
     volumes:
-      - "./es-init:/usr/share/elasticsearch/es-init"
+      - data-standalone:/usr/share/elasticsearch/data
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9200"]
       interval: 60s
@@ -133,6 +136,8 @@ services:
 volumes:
     db-data:
     db-data2:
+    data-standalone:
+        driver: local
 
 networks:
     docker-network:

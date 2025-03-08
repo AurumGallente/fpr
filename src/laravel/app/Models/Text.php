@@ -8,6 +8,7 @@ use App\Http\Filters\Api\V1\TextsFilter;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use PDPhilip\Elasticsearch\Eloquent\HybridRelations;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\Project;
@@ -19,7 +20,7 @@ use StdClass;
 
 class Text extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, HybridRelations;
 
     /**
      * @var string
@@ -126,6 +127,11 @@ class Text extends Model
     public function scopeFilter(Builder $builder, TextsFilter $filter): Builder
     {
         return $filter->apply($builder);
+    }
+
+    public function EStext(): \PDPhilip\Elasticsearch\Relations\HasOne|\Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(EStext::class, 'external_id', 'id');
     }
 
 
