@@ -22,8 +22,9 @@
                         </li>
                         @endif
                         <li>
-                            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Dropdown</a>
+                            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Profile</a>
                             <div class="dropdown-menu dropdown-menu-end">
+                                <a class="dropdown-item" href="{{route('profile.edit')}}">Edit Profile</a>
                                 <form method="POST" action="{{ route('logout') }}">
                                     @csrf
 
