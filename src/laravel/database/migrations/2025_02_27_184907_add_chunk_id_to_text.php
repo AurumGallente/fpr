@@ -12,7 +12,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('text', function (Blueprint $table) {
+        Schema::table('texts', function (Blueprint $table) {
+            $table->dropColumn(['chunks_ids']);
+        });
+        Schema::table('texts', function (Blueprint $table) {
             DB::statement('ALTER TABLE texts ADD COLUMN chunks_ids integer[]');
         });
     }
@@ -22,7 +25,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('text', function (Blueprint $table) {
+        Schema::table('texts', function (Blueprint $table) {
             $table->dropColumn(['chunks_ids']);
         });
     }
