@@ -51,7 +51,8 @@ class ElasticIndexes extends Command
             'sl_text_index'=>'standard',
             'es_text_index'=>'spanish',
             'tr_text_index'=>'turkish',
-            'ru_text_index'=>'russian'
+            'ru_text_index'=>'russian',
+            'sv_text_index' =>'swedish',
         ];
 
         if(!env('ES_HOSTS')){
@@ -77,11 +78,20 @@ class ElasticIndexes extends Command
                 $index->settings('number_of_replicas', $replicas);
                 $index->integer('external_id');
                 $index->integer('project_id');
-                $index->text('content')->analyzer($analyzer);
+                $index->text('original_content');
                 $index->text('normalized_content')->analyzer($analyzer);
                 $index->date('created_at');
             });
             $output->writeln("<info>$analyzer index created.</info>");
         }
+
+        Schema::createIfNotExists('chunks', static function (IndexBlueprint $index) use ($shards, $replicas) {
+            $index->settings('number_of_shards', $shards);
+            $index->settings('number_of_replicas', $replicas);
+            $index->integer('external_id');
+            $index->text('original_content')->analyzer('standard');
+            $index->date('created_at');
+        });
+        $output->writeln("<info>'chunks' index created.</info>");
     }
 }

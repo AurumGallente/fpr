@@ -2,23 +2,15 @@
 
 namespace App\Helpers;
 
+use JsonException;
 use Symfony\Component\Process\Process;
+use App\Models\Text;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use \stdClass as stdClass;
 
 
 class ReadabilityHelper
 {
-    /**
-     * @var mixed|string
-     */
-    private string $language;
-
-    /**
-     * @var string
-     */
-    private string $text;
-
     /**
      * @var bool
      */
@@ -27,7 +19,7 @@ class ReadabilityHelper
     /**
      *
      */
-    const LIMIT = 200;
+    const int LIMIT = 200;
 
     /**
      * @param string $text
@@ -35,11 +27,11 @@ class ReadabilityHelper
      *
      * @return $this
      */
-    public function __construct(string $text, string $language = 'en')
+    public function __construct(
+        private string $text,
+        private string $language = 'en'
+    )
     {
-        $this->language = $language;
-        $this->text = $text;
-
         $this->checkWordsNumber();
 
         return $this;
@@ -67,7 +59,7 @@ class ReadabilityHelper
     private function checkWordsNumber(): void
     {
 
-        if((new WordCounterHelper($this->text))->countWords() < self::LIMIT)
+        if(new WordCounterHelper($this->text)->countWords() < self::LIMIT)
         {
             $this->isValid = false;
         } else
@@ -93,6 +85,7 @@ class ReadabilityHelper
 
     /**
      * @return stdClass
+     * @throws JsonException
      */
     public function getResult(): stdClass
     {
@@ -100,7 +93,7 @@ class ReadabilityHelper
         {
             $rawResult = $this->processText();
             $rawResult = trim($rawResult);
-            $result = json_decode($rawResult);
+            $result = json_decode($rawResult, false, 512, JSON_THROW_ON_ERROR);
 
         } else
         {
@@ -149,10 +142,11 @@ class ReadabilityHelper
      * @param string $string Text that might have accent characters
      * @return string Filtered string with replaced "nice" characters.
      */
-    function remove_accents(string $string): string
+    public function remove_accents(string $string): string
     {
-        if ( !preg_match('/[\x80-\xff]/', $string) )
+        if ( !preg_match('/[\x80-\xff]/', $string) ) {
             return $string;
+        }
 
         if ($this->seems_utf8($string)) {
             $chars = array(
@@ -278,5 +272,41 @@ class ReadabilityHelper
         }
 
         return $string;
+    }
+
+    public function chunking(): array
+    {
+        $step = round(Text::CHUNK_LENGTH/2);
+        $chunks = [];
+        foreach(explode("\n", $this->text) as $text)
+        {
+            // remove punctuation
+            $text=  preg_replace("#[[:punct:]]#", "", $text);
+            // remove extra whitespaces
+            $text = preg_replace('/\s+/', ' ', $text);
+            // remove diacritics
+            $text = $this->remove_accents($text);
+            $words = explode(' ', $text);
+            $count = count($words);
+            if($count > Text::CHUNK_LENGTH)
+            {
+                for($i = 0; $i <= ($count-Text::CHUNK_LENGTH); $i += $step)
+                {
+                    $chunk = [];
+                    for($j = 0; $j < Text::CHUNK_LENGTH; $j++)
+                    {
+                        $chunk[] = $words[$i + $j];
+                    }
+                    $chunks[] = implode(' ', $chunk);
+                }
+            } else
+            {
+                $chunks[] = implode(' ', $words);
+            }
+        }
+
+        return array_filter($chunks, static function($chunk){
+            return (bool) preg_replace('/\s+/', '', $chunk);
+        });
     }
 }

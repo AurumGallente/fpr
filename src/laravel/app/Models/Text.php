@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Helpers\ReadabilityHelper;
 use App\Http\Filters\Api\V1\QueryFilter;
 use App\Http\Filters\Api\V1\TextsFilter;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -16,6 +17,7 @@ use App\Models\User;
 use App\Models\Chunk;
 use Illuminate\Database\Eloquent\Builder;
 use StdClass;
+use App\Casts\Pgarray;
 
 
 class Text extends Model
@@ -38,7 +40,19 @@ class Text extends Model
         'metrics',
     ];
 
+    protected function casts(): array
+    {
+        return [
+            'chunks_ids' => Pgarray::class,
+        ];
+    }
+
     const CHUNK_LENGTH = 5;
+
+    /**
+     *
+     */
+    const RESULTS_LIMIT = 10;
 
     /**
      * @return BelongsTo
@@ -86,37 +100,7 @@ class Text extends Model
      */
     public function chunking(): array
     {
-        $helper = new ReadabilityHelper($this->content, $this->project->language->code);
-        $step = round(self::CHUNK_LENGTH/2);
-        $chunks = [];
-        foreach(explode("\n", $this->content) as $text)
-        {
-            // remove punctuation
-            $text=  preg_replace("#[[:punct:]]#", "", $text);
-            // remove extra whitespaces
-            $text = preg_replace('/\s+/', ' ', $text);
-            // remove diacritics
-            $text = $helper->remove_accents($text);
-            $words = explode(' ', $text);
-            $count = count($words);
-            if($count > self::CHUNK_LENGTH)
-            {
-                for($i = 0; $i <= ($count-self::CHUNK_LENGTH); $i = $i + $step)
-                {
-                    $chunk = [];
-                    for($j = 0; $j < self::CHUNK_LENGTH; $j++)
-                    {
-                        $chunk[] = $words[$i + $j];
-                    }
-                    $chunks[] = implode(' ', $chunk);
-                }
-            } else
-            {
-                $chunks[] = implode(' ', $words);
-            }
-        }
-
-        return $chunks;
+        return new ReadabilityHelper($this->content, $this->project->language->code)->chunking();
     }
 
     /**
@@ -129,10 +113,38 @@ class Text extends Model
         return $filter->apply($builder);
     }
 
+
+    /**
+     * @return \PDPhilip\Elasticsearch\Relations\HasOne|\Illuminate\Database\Eloquent\Relations\HasOne
+     */
     public function EStext(): \PDPhilip\Elasticsearch\Relations\HasOne|\Illuminate\Database\Eloquent\Relations\HasOne
     {
         return $this->hasOne(EStext::class, 'external_id', 'id');
     }
 
+
+    /**
+     * @return Collection
+     */
+    public function findSimilarByChunks(int $limit = self::RESULTS_LIMIT): Collection
+    {
+        $project = $this->project()->withTrashed()->first();
+        $chunkIds = $this->chunks_ids;
+        return self::where('project_id', '!=', $project->id)
+            ->whereRaw("texts.chunks_ids && '{".implode(' ,', $chunkIds)."}'::int[]")
+            ->limit($limit)
+            ->get();
+    }
+
+    /**
+     * @param Text $text
+     * @param int $limit
+     * @return Collection
+     */
+    public function getCommonChunks(Text $text, int $limit = self::RESULTS_LIMIT): Collection
+    {
+        $chunksIDs =array_intersect($this->chunks_ids, $text->chunks_ids);
+        return Chunk::whereIn('id', $chunksIDs)->where('content','!=',' ')->limit($limit)->get();
+    }
 
 }

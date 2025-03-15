@@ -35,12 +35,11 @@ class CreateChunks implements ShouldQueue
         {
             $row = Chunk::firstOrCreate([
                 'content' => $chunk,
-                'hash' => md5($chunk),
             ]);
             $ids[] = $row->id;
         }
         $this->text->chunks()->attach($ids);
-        $this->text->chunks_ids =  '{'.implode(' ,', $ids).'}';
+        $this->text->chunks_ids = $ids;
         $this->text->save();
     }
 }

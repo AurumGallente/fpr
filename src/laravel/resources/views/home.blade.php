@@ -17,33 +17,74 @@
             </p>
         </div>
     </div>
-    <div class="row">
+    <div id="es-search" class="row">
         <div class="col-12">
-            <form class="">
                 <div class="form-group">
                     <label for="text_search">Text search:</label>
-                    <textarea dusk="text_search" name="text_search" v-model="text_search" class="form-control" id="text_search" rows="8" >
+                    <textarea dusk="text_search" name="text_search" v-model="text_search" class="form-control" id="t_search" rows="8" placeholder="Put your text here to search similar texts">
                     </textarea>
                 </div>
-                <button type="submit" class="btn btn-primary">Submit</button>
-            </form>
+                <button v-on:click="es_search" class="btn btn-primary">Submit</button>
         </div>
     </div>
-    <script>
-        let app = {
-            data() {
-                return {
-                    text_search: '{{ old('text_search') ?? '' }}',
+
+    <div class="row">
+        <div class="col-12">
+            <ul>
+                <li class="card" v-for="item in items" :key="index">
+                        <a v-bind:href="item.link" target="_blank">
+                            <p class="col-6 text-truncate">Text:
+                                <span class="italic">
+                                    @{{item.content}}
+                                </span>
+                            </p>
+                        </a>
+                        For project: <a v-bind:href="item.project_link" target="_blank">
+                            @{{ item.project_id }}
+                        </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    @push('custom-scripts')
+        <script type="module">
+            const { createApp, ref } = Vue
+            createApp({
+                setup() {
+                    const text_search = ref('');
+                    const items = ref([]);
+                    const csrfToken = document.head.querySelector('meta[name="csrf-token"]').content;
+                    const headers = new Headers({
+                        "Content-Type": "application/json",
+                        'X-XSRF-TOKEN': csrfToken
+                    });
+                    const token = "{{ csrf_token() }}";
+                    const search_url = '{{route('texts.search')}}';
+                    async function es_search() {
+                        const response = await fetch(search_url, {
+                            method: 'POST',
+                            headers: headers,
+                            body: JSON.stringify({ text: text_search.value, _token:token })
+                        });
+
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok: ' + response.statusText);
+                        }
+
+                        const data = await response.json();
+                        items.value = data.texts;
+                        console.log(items);
+                    }
+                    return {
+                        text_search,
+                        es_search,
+                        items
+                    }
                 }
-            },
-            mounted() {
-
-            },
-            methods: {
-
-            }
-        };
-    </script>
+            }).mount('#app')
+        </script>
+    @endpush
 </x-app>
 
 

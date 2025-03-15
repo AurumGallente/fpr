@@ -38,14 +38,12 @@ class PutTextToES implements ShouldQueue
             $normalizedText,
             $this->text->project->language->code
         );
-        $normalizedText =  preg_replace("#[[:punct:]]#", "", $normalizedText);
-        $normalizedText = preg_replace('/\s+/', ' ', $normalizedText);
-        $normalizedText = $helper->remove_accents($normalizedText);
+
 
         $esText = new EStext;
         $esText->created_at = $this->text->created_at;
-        $esText->content = $this->text->content;
-        $esText->normalized_content = strtolower($normalizedText);
+        $esText->original_content = $this->text->content;
+        $esText->normalized_content = $this->text->content;
         $esText->external_id = $this->text->id;
         $esText->project_id = $this->text->project->id;
         $esText->setIndex($this->text->project->language->code.'_text_index');

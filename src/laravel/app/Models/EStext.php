@@ -2,9 +2,10 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use PDPhilip\Elasticsearch\Eloquent\Model as Eloquent;
 use \PDPhilip\Elasticsearch\Collection\ElasticCollection;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection;
 use App\Models\Text;
 
 class EStext extends Eloquent
@@ -30,6 +31,11 @@ class EStext extends Eloquent
     const string INDEX_PATTERN = '_text_index';
 
     /**
+     * @var string|null
+     */
+    public string|null $content;
+
+    /**
      * @return \PDPhilip\Elasticsearch\Relations\BelongsTo
      */
     public function text(): \PDPhilip\Elasticsearch\Relations\BelongsTo
@@ -37,15 +43,22 @@ class EStext extends Eloquent
         return $this->belongsTo(Text::class, 'external_id', 'id');
     }
 
-    public function findSimilarByChunks(Collection $chunks): ElasticCollection
+    /**
+     * @param Collection $chunks
+     * @param int|null $start
+     * @param int|null $limit
+     * @return ElasticCollection
+     */
+    public function findSimilarByChunks(Collection $chunks, int|null $start = null, int|null $limit = null): ElasticCollection
     {
         if(!env('ES_HOSTS'))
         {
             return new ElasticCollection;
         }
 
-        $project_id = $this->text->project_id;
-        $id = $this->text->id;
+        $project_id = $this->text?->project_id;
+        $id = $this->text?->id;
+        $content = $this->text ? $this->text->content : $this->content;
 
         $bodyParams = [
             'query' => [
@@ -54,15 +67,11 @@ class EStext extends Eloquent
 
                     ],
                     'should' => [
-                        [
-                            'more_like_this' => [
-                                'fields' => ['content', 'normalized_content'],
-                                'like' => $this->text->content
-                            ]
-                        ]
+
                     ]
                 ],
             ],
+            'track_scores' => true,
             'sort' => [
                 '_score' => [
                     'order' => 'desc'
@@ -70,32 +79,76 @@ class EStext extends Eloquent
             ],
         ];
 
+        if($limit !== null)
+        {
+            $bodyParams['size'] = $limit;
+        }
+
+        if($start !== null)
+        {
+            $bodyParams['from'] = $start;
+        }
+
+        $bodyParams['query']['bool']['should'][] =
+            [
+                'more_like_this' =>
+                    [
+                        'fields' => ['original_content', 'normalized_content'],
+                        'like' => $content
+                    ]
+            ];
+
         foreach ($chunks as $chunk)
         {
+            if($chunk instanceof Chunk)
+            {
+                $chunkContent = $chunk->content;
+            } else
+            {
+                $chunkContent = $chunk;
+            }
             $bodyParams['query']['bool']['should'][] = [
                 'match_phrase' => [
-                    'normalized_content' => $chunk->content,
+                    'normalized_content' => $chunkContent,
                 ],
             ];
             $bodyParams['query']['bool']['should'][] = [
                 'match_phrase' => [
-                    'content' => $chunk->content,
+                    'original_content' => $chunkContent,
                 ],
             ];
         }
-
-        $bodyParams['query']['bool']['must_not'][] = [
-            'term' => [
-                'project_id' => $project_id,
-            ],
-        ];
-        $bodyParams['query']['bool']['must_not'][] = [
-            'term' => [
-                'external_id' => $id,
-            ]
-        ];
-
-
+        if($project_id)
+        {
+            $bodyParams['query']['bool']['must_not'][] = [
+                'term' => [
+                    'project_id' => $project_id,
+                ],
+            ];
+        }
+        if($id)
+        {
+            $bodyParams['query']['bool']['must_not'][] = [
+                'term' => [
+                    'external_id' => $id,
+                ]
+            ];
+        }
         return self::rawSearch($bodyParams);
+    }
+
+    /**
+     * @param array $searchResults
+     * @return array
+     */
+    public function prettySearchResults(array $searchResults): array
+    {
+        foreach($searchResults as &$searchResult)
+        {
+            $searchResult['link'] = route('texts.show', ['id' => $searchResult['external_id']]);
+            $searchResult['project_link'] = route('projects.show', ['id' => $searchResult['project_id']]);
+            $searchResult['date_formatted'] = Carbon::parse($searchResult['created_at'])->format('Y-m-d H:i');
+        }
+        return $searchResults;
     }
 }

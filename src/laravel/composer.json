@@ -8,6 +8,7 @@
     "require": {
         "php": "^8.2",
         "elasticsearch/elasticsearch": "^8.17",
+        "jfcherng/php-diff": "^6.16",
         "laravel/framework": "^11.31",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
@@ -15,6 +16,7 @@
         "staudenmeir/eloquent-json-relations": "^1.1"
     },
     "require-dev": {
+        "barryvdh/laravel-debugbar": "^3.15",
         "fakerphp/faker": "^1.23",
         "knuckleswtf/scribe": "^4.40",
         "laravel/breeze": "^2.3",

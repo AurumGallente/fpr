@@ -13,7 +13,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('texts', function (Blueprint $table) {
-            DB::statement('ALTER TABLE texts ADD COLUMN chunks_ids integer[]');
+            DB::statement("UPDATE texts SET chunks_ids = '{}'::int[] WHERE chunks_ids IS NULL;");
+            DB::statement("ALTER TABLE texts ALTER COLUMN chunks_ids SET DEFAULT '{}'::int[];");
         });
     }
 
@@ -23,7 +24,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('texts', function (Blueprint $table) {
-            $table->dropColumn('chunks_ids');
+            DB::statement("ALTER TABLE texts ALTER COLUMN chunks_ids SET DEFAULT NULL");
         });
     }
 };
