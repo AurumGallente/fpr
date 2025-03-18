@@ -71,23 +71,22 @@
 
         @if($ESsearchResults->count())
             <a class="btn btn-primary" data-toggle="collapse" href="#multiCollapseExample1" role="button" aria-expanded="false" aria-controls="multiCollapseExample1">Some similar texts found. Perhaps, worth checking:</a>
-            <p>Here are some of them:</p>
         @endif
-        @foreach($ESsearchResults as $searchResult)
-            <div class="row">
-                <div class="col-12 collapse multi-collapse" id="multiCollapseExample1">
-                    <p>
-                        <?php $plagiarismProject = \App\Models\Project::withTrashed()->where('id', $searchResult->project_id)->first(); ?>
-                        @if($plagiarismProject)
-                            Project: <a href="{{route('projects.show', ['id' => $plagiarismProject->id])}}" target="_blank">{{$plagiarismProject->name}}</a>,
-                            Text ID: <a href="{{route('texts.show', ['id' => $searchResult->external_id])}}">{{$searchResult->external_id}}</a>
-                    </p>
+        <div class="row">
+            <div class="col-12 collapse multi-collapse" id="multiCollapseExample1">
+                <p>Here are some of them:</p>
+                @foreach($ESsearchResults as $searchResult)
+                            <p>
+                                <?php $plagiarismProject = \App\Models\Project::withTrashed()->where('id', $searchResult->project_id)->first(); ?>
+                                @if($plagiarismProject)
+                                    Project: <a href="{{route('projects.show', ['id' => $plagiarismProject->id])}}" target="_blank">{{$plagiarismProject->name}}</a>,
+                                    Text ID: <a href="{{route('texts.show', ['id' => $searchResult->external_id])}}">{{$searchResult->external_id}}</a>
+                            </p>
 
-                        @endif
-
-                </div>
+                                @endif
+                @endforeach
             </div>
-        @endforeach
+        </div>
         <div class="row">
             <div class="col-12">
                 <div class="card mb-auto">

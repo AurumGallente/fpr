@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Carbon\Carbon;
 use PDPhilip\Elasticsearch\Eloquent\Model as Eloquent;
-use \PDPhilip\Elasticsearch\Collection\ElasticCollection;
+use PDPhilip\Elasticsearch\Collection\ElasticCollection;
 use Illuminate\Support\Collection;
 use App\Models\Text;
 
@@ -151,4 +151,6 @@ class EStext extends Eloquent
         }
         return $searchResults;
     }
+
+
 }

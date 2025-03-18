@@ -148,6 +148,7 @@ return [
                 'ssl_verification' => env('ES_OPT_VERIFY_SSL', true),
                 'retires'          => env('ES_OPT_RETRIES', null),
                 'meta_header'      => env('ES_OPT_META_HEADERS', true),
+                'insert_chunk_size'=> 2000,
             ],
             'error_log_index' => env('ES_ERROR_INDEX', false), //If set will log ES errors to this index, ex: 'laravel_es_errors'
         ],

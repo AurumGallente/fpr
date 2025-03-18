@@ -129,9 +129,8 @@ class Text extends Model
     public function findSimilarByChunks(int $limit = self::RESULTS_LIMIT): Collection
     {
         $project = $this->project()->withTrashed()->first();
-        $chunkIds = $this->chunks_ids;
         return self::where('project_id', '!=', $project->id)
-            ->whereRaw("texts.chunks_ids && '{".implode(' ,', $chunkIds)."}'::int[]")
+            ->whereRaw("texts.chunks_ids && '{".implode(' ,', $this->chunks_ids)."}'::int[]")
             ->limit($limit)
             ->get();
     }

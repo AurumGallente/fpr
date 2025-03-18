@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ReadabilityHelper;
+use App\Models\Chunk;
+use App\Models\ESChunk;
 use App\Models\EStext;
 use App\Models\Text;
 use Illuminate\Http\JsonResponse;
@@ -107,6 +109,8 @@ class TextsController extends Controller implements HasMiddleware
         $chunks = collect($helper->chunking());
         $EStext = new EStext();
         $EStext->content = $text;
+        $ESchunk = new ESChunk;
+        //dd($ESchunk->where('original_content','like',$ESchunk->escapeElasticsearchQuery($text))->distinct()->limit(10)->get(['original_content','external_id', 'score']));
         $searchResult = $EStext->findSimilarByChunks($chunks)->toArray();
         return response()->json([
             'texts' => $EStext->prettySearchResults($searchResult)

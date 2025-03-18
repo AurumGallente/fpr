@@ -12,7 +12,7 @@ class ChunkObserver
      */
     public function created(Chunk $chunk): void
     {
-        PutChunkToES::dispatch($chunk)->onQueue('chunk_processing');
+
     }
 
     /**

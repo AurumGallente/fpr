@@ -58,6 +58,7 @@ services:
     volumes:
       - "./src/laravel:/var/www/html"
       - "/var/www/html/node_modules"
+      - "./php/php.ini:/usr/local/etc/php/conf.d/custom.ini"
     networks:
       - docker-network
       - docker-testing-network
@@ -149,6 +150,23 @@ services:
 #    networks:
 #      - docker-network
 #      - docker-testing-network
+
+  centrifugo:
+    container_name: centrifugo
+    image: centrifugo/centrifugo:v6
+    volumes:
+      - ./config.json:/centrifugo/config.json
+    command: centrifugo -c config.json
+    ports:
+      - "8001:8000"
+    ulimits:
+      nofile:
+        soft: 65535
+        hard: 65535
+    networks:
+      - docker-network
+      - docker-testing-network
+
 
 
 volumes:

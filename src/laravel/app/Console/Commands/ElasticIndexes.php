@@ -63,7 +63,7 @@ class ElasticIndexes extends Command
         do {
             $output->writeln("<info>Check if ES is ready to accept requests...</info>");
             $response = Http::get(env('ES_HOSTS'));
-            sleep(5);
+            sleep(1);
         } while ($response->failed());
 
         $output->writeln("<info>It is ready.</info>");
