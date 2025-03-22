@@ -44,9 +44,6 @@ listen:
 listen_text:
 	$(dc) run -it --rm php /var/www/html/artisan queue:listen --timeout=3600 --queue=text_processing
 
-listen_chunk:
-	$(dc) run -it --rm php /var/www/html/artisan queue:listen --timeout=3600 --queue=chunk_processing
-
 seed:
 	$(dc) run -it --rm php /var/www/html/artisan db:seed
 
@@ -60,7 +57,6 @@ npm_b:
 	$(dc) run --rm npm run build
 
 dusk:
-	$(dc) run -it --rm php /var/www/html/artisan es:create-index && \
 	$(dc) run -it --rm php /var/www/html/artisan dusk
 
 dusk_head:
@@ -70,7 +66,6 @@ dusk_head:
 		CYGWIN*|MINGW*) command -v start >/dev/null && start $(watch_url) || echo "No browser available"; ;; \
 		*) echo "Unsupported OS: $$(uname)" ;; \
 	  esac
-	$(dc) run -it --rm php /var/www/html/artisan es:create-index && \
 	$(dc) run -it --rm php /var/www/html/artisan dusk
 
 es_index_create:

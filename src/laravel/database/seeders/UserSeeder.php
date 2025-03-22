@@ -19,7 +19,10 @@ class UserSeeder extends Seeder
         for($i=1; $i<=20; $i++){
             $user = new User();
             $user->name = $faker->name;
-            $user->email = $faker->unique()->safeEmail;
+            do {
+                $user->email = $faker->unique()->safeEmail;
+                $match = User::where('email', $user->email)->withTrashed()->first();
+            } while($match);
             $user->password = Hash::make('password');
             $user->save();
         }

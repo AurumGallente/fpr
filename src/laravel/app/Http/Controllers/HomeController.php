@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\DiffHelper;
 use App\Helpers\ReadabilityHelper;
 use App\Models\Project;
 use App\Models\Text;

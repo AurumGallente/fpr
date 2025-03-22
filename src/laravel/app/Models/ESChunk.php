@@ -6,18 +6,34 @@ use Carbon\Carbon;
 use PDPhilip\Elasticsearch\Eloquent\Model as Eloquent;
 use PDPhilip\Elasticsearch\Collection\ElasticCollection;
 use Illuminate\Support\Collection;
+use PDPhilip\Elasticsearch\Relations\BelongsTo;
 
 class ESChunk extends Eloquent
 {
+    /**
+     * @var string
+     */
     protected $connection = 'elasticsearch';
 
+    /**
+     * @var string
+     */
     protected $index = 'chunks';
 
     const null UPDATED_AT = null;
 
+    /**
+     * @var string|null
+     */
     public string|null $content;
 
-    public function chunk(): \PDPhilip\Elasticsearch\Relations\BelongsTo
+
+    const int ES_CHUNKS_LIMIT = 1024;
+
+    /**
+     * @return BelongsTo
+     */
+    public function chunk(): BelongsTo
     {
         return $this->belongsTo(Chunk::class, 'external_id', 'id');
     }

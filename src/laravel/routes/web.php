@@ -30,6 +30,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/texts/{id}', [TextsController::class, 'show'])->name('texts.show');
     Route::get('/texts', [TextsController::class, 'index'])->name('texts.index');
     Route::post('/texts/search', [TextsController::class, 'search'])->name('texts.search');
+    Route::post('/texts/compare', [TextsController::class, 'compare'])->name('texts.compare');
 });
 
 require __DIR__.'/auth.php';

@@ -42,7 +42,7 @@ class ProjectTest extends DuskTestCase
                 ->click('@submit')
                 ->assertRouteIs('projects.index');
         });
-        $this->assertDatabaseHas('projects', ['id' => $project->id, 'name' => $data['name'].'_upd', 'description' => $data['description'].'_upd']);
+        $this->assertDatabaseHas('projects', ['id' => $project->id, 'name' => '_upd'.$data['name'], 'description' => $data['description'].'_upd']);
     }
 
     /**

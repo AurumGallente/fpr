@@ -108,7 +108,7 @@ services:
 
 
   elasticsearch:
-    image: elasticsearch:8.16.4
+    image: elasticsearch:7.17.28
     container_name: elasticsearch
     depends_on:
       - nginx
@@ -116,9 +116,11 @@ services:
       - "${ES_OUTER_PORT}:${ES_INNER_PORT}"
     environment:
       - discovery.type=single-node
-      - xpack.security.enabled=false
-      - xpack.security.enrollment.enabled=false
+      - xpack.security.enabled=true
+      - xpack.monitoring.collection.enabled=true
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - ELASTIC_PASSWORD=${ES_PASSWORD}
+      - indices.query.bool.max_clause_count=${ES_MAX_CLAUSE_COUNT}
     ulimits:
       memlock:
         soft: -1
@@ -135,7 +137,7 @@ services:
       - docker-testing-network
 
 #  kibana:
-#    image: docker.elastic.co/kibana/kibana:8.16.4
+#    image: docker.elastic.co/kibana/kibana:7.17.28
 #    container_name: kibana
 #    volumes:
 #      - kibana_data:/usr/share/kibana/data
@@ -144,6 +146,8 @@ services:
 #    environment:
 #      - ELASTICSEARCH_HOSTS=${ES_HOSTS}
 #      - NODE_OPTIONS=--max-old-space-size=1024
+#      - ELASTICSEARCH_USERNAME=elastic
+#      - ELASTICSEARCH_PASSWORD=${ES_PASSWORD}
 #    mem_limit: 1g
 #    ports:
 #      - "${KIBANA_OUTER_PORT}:${KIBANA_INNER_PORT}"
@@ -155,10 +159,13 @@ services:
     container_name: centrifugo
     image: centrifugo/centrifugo:v6
     volumes:
-      - ./config.json:/centrifugo/config.json
+      - "./config.json:/centrifugo/config.json"
     command: centrifugo -c config.json
+    depends_on:
+      - php
+      - nginx
     ports:
-      - "8001:8000"
+      - "${CENT_OUTER_PORT}:${CENT_INNER_PORT}"
     ulimits:
       nofile:
         soft: 65535
@@ -167,13 +174,11 @@ services:
       - docker-network
       - docker-testing-network
 
-
-
 volumes:
     db-data:
     db-data2:
     data-standalone:
-#    kibana_data:
+    kibana_data:
         driver: local
 
 networks:

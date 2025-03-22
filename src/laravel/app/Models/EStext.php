@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use App\Helpers\DiffHelper;
 use Carbon\Carbon;
+use JsonException;
 use PDPhilip\Elasticsearch\Eloquent\Model as Eloquent;
 use PDPhilip\Elasticsearch\Collection\ElasticCollection;
 use Illuminate\Support\Collection;
@@ -55,7 +57,7 @@ class EStext extends Eloquent
         {
             return new ElasticCollection;
         }
-
+        $chunks = $chunks->take(round(env('ES_MAX_CLAUSE_COUNT', ESChunk::ES_CHUNKS_LIMIT)/2 - 1));
         $project_id = $this->text?->project_id;
         $id = $this->text?->id;
         $content = $this->text ? $this->text->content : $this->content;
@@ -88,15 +90,6 @@ class EStext extends Eloquent
         {
             $bodyParams['from'] = $start;
         }
-
-        $bodyParams['query']['bool']['should'][] =
-            [
-                'more_like_this' =>
-                    [
-                        'fields' => ['original_content', 'normalized_content'],
-                        'like' => $content
-                    ]
-            ];
 
         foreach ($chunks as $chunk)
         {
@@ -139,15 +132,26 @@ class EStext extends Eloquent
 
     /**
      * @param array $searchResults
+     * @param string $text
      * @return array
+     * @throws JsonException
      */
-    public function prettySearchResults(array $searchResults): array
+    public function prettySearchResults(array $searchResults, string $text = ''): array
     {
+        $helper = new DiffHelper();
         foreach($searchResults as &$searchResult)
         {
             $searchResult['link'] = route('texts.show', ['id' => $searchResult['external_id']]);
             $searchResult['project_link'] = route('projects.show', ['id' => $searchResult['project_id']]);
             $searchResult['date_formatted'] = Carbon::parse($searchResult['created_at'])->format('Y-m-d H:i');
+            if($text)
+            {
+                $searchResult['common_string'] = $helper->longestCommonSubstring($searchResult['original_content'], $text)->longest_common_sequence;
+            } else
+            {
+                $searchResult['common_string'] = '';
+            }
+
         }
         return $searchResults;
     }

@@ -3,58 +3,54 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Http\Client\ConnectionException;
-use PDPhilip\Elasticsearch\Schema\Schema;
-use PDPhilip\Elasticsearch\Schema\IndexBlueprint;
-use PDPhilip\Elasticsearch\Schema\AnalyzerBlueprint;
 use Illuminate\Support\Facades\Http;
-use Elastic\Elasticsearch\ClientBuilder;
+use PDPhilip\Elasticsearch\Schema\IndexBlueprint;
+use PDPhilip\Elasticsearch\Schema\Schema;
 
-class ElasticIndexes extends Command
+class ElasticTestIndexes extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'es:create-index';
+    protected $signature = 'es:create-test-index';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Creates indexes for Elasticsearch';
+    protected $description = 'Creates test indexes for Elasticsearch';
 
     /**
      * Execute the console command.
-     * @throws ConnectionException
      */
     public function handle(): void
     {
+
         $output = new \Symfony\Component\Console\Output\ConsoleOutput();
 
 
         $array = [
-            'cs_text_index'=>'czech',
-            'da_text_index'=>'danish',
-            'nl_text_index'=>'dutch',
-            'en_text_index'=>'english',
-            'et_text_index'=>'estonian',
-            'fi_text_index'=>'finnish',
-            'de_text_index'=>'german',
-            'fr_text_index'=>'french',
-            'el_text_index'=>'greek',
-            'it_text_index'=>'italian',
-            'no_text_index'=>'norwegian',
-            'pl_text_index'=>'standard',
-            'pt_text_index'=>'portuguese',
-            'sl_text_index'=>'standard',
-            'es_text_index'=>'spanish',
-            'tr_text_index'=>'turkish',
-            'ru_text_index'=>'russian',
-            'sv_text_index' =>'swedish',
+            'test_cs_text_index'=>'czech',
+            'test_da_text_index'=>'danish',
+            'test_nl_text_index'=>'dutch',
+            'test_en_text_index'=>'english',
+            'test_et_text_index'=>'estonian',
+            'test_fi_text_index'=>'finnish',
+            'test_de_text_index'=>'german',
+            'test_fr_text_index'=>'french',
+            'test_el_text_index'=>'greek',
+            'test_it_text_index'=>'italian',
+            'test_no_text_index'=>'norwegian',
+            'test_pl_text_index'=>'standard',
+            'test_pt_text_index'=>'portuguese',
+            'test_sl_text_index'=>'standard',
+            'test_es_text_index'=>'spanish',
+            'test_tr_text_index'=>'turkish',
+            'test_ru_text_index'=>'russian',
+            'test_sv_text_index' =>'swedish',
         ];
 
         if(!env('ES_HOSTS')){

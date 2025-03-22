@@ -75,16 +75,11 @@
         <div class="row">
             <div class="col-12 collapse multi-collapse" id="multiCollapseExample1">
                 <p>Here are some of them:</p>
-                @foreach($ESsearchResults as $searchResult)
-                            <p>
-                                <?php $plagiarismProject = \App\Models\Project::withTrashed()->where('id', $searchResult->project_id)->first(); ?>
-                                @if($plagiarismProject)
-                                    Project: <a href="{{route('projects.show', ['id' => $plagiarismProject->id])}}" target="_blank">{{$plagiarismProject->name}}</a>,
-                                    Text ID: <a href="{{route('texts.show', ['id' => $searchResult->external_id])}}">{{$searchResult->external_id}}</a>
-                            </p>
-
-                                @endif
-                @endforeach
+                <div v-for="item in items" :key="item.project_id">
+                    <p>Project: <a v-bind:href="item.project_href" target="_blank">@{{item.project_name}}</a>,</p>
+                    <p>Text ID: <a v-bind:href="item.text_href">@{{item.text_id}}</a></p>
+                    <p><span class="text-decoration-underline">Common longest string</span>: <span>@{{item.substring}}</span></p>
+                </div>
             </div>
         </div>
         <div class="row">
@@ -102,4 +97,57 @@
             </div>
         </div>
     </div>
+    @push('custom-scripts')
+        <script type="module">
+            const { createApp, ref } = Vue
+            createApp({
+                setup() {
+                    const text_search = ref('');
+                    const csrfToken = document.head.querySelector('meta[name="csrf-token"]').content;
+                    const headers = new Headers({
+                        "Content-Type": "application/json",
+                        'X-XSRF-TOKEN': csrfToken
+                    });
+                    const token = "{{ csrf_token() }}";
+                    const text = "{{json_encode($text->content)}}";
+                    const items = ref([
+                    @foreach($ESsearchResults as $searchResult)
+                            <?php $plagiarismProject = \App\Models\Project::withTrashed()->where('id', $searchResult->project_id)->first(); ?>
+                            <?php if(!$plagiarismProject) { continue; } ?>
+
+                    {
+                        project_href: "{{route('projects.show', ['id' => $plagiarismProject->id])}}",
+                        project_name: "{{$plagiarismProject->name}}",
+                        text_href:    "{{route('texts.show', ['id' => $searchResult->external_id])}}",
+                        text_id:       {{$searchResult->external_id}},
+                        content:      "{{json_encode($searchResult->original_content)}}",
+                        substring:    "Loading...",
+                    },
+                    @endforeach
+                    ])
+                    async function diff_request(){
+                        const requests = this.items.map(item =>
+                            axios.post("{{route('texts.compare')}}", {
+                                headers: headers,
+                                text1: text,
+                                text2: item.content,
+                            })
+                                .then(response => {
+                                    item.substring = response.data.substring.longest_common_sequence;
+                                })
+                        );
+                        await Promise.all(requests);
+                    }
+                    return {
+                        text_search,
+                        items,
+                        diff_request
+                    }
+                },
+                mounted: function(){
+                    this.diff_request();
+                }
+            }).mount('#app')
+        </script>
+    @endpush
 </x-app>
