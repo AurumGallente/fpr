@@ -4,8 +4,10 @@
 /public/docs
 /public/hot
 /public/storage
+/public/public
 /storage/*.key
 /storage/pail
+/storage/debugbar
 /vendor
 .env
 .env.backup
