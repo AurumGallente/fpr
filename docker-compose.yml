@@ -155,24 +155,6 @@ services:
 #      - docker-network
 #      - docker-testing-network
 
-  centrifugo:
-    container_name: centrifugo
-    image: centrifugo/centrifugo:v6
-    volumes:
-      - "./config.json:/centrifugo/config.json"
-    command: centrifugo -c config.json
-    depends_on:
-      - php
-      - nginx
-    ports:
-      - "${CENT_OUTER_PORT}:${CENT_INNER_PORT}"
-    ulimits:
-      nofile:
-        soft: 65535
-        hard: 65535
-    networks:
-      - docker-network
-      - docker-testing-network
 
 volumes:
     db-data:
