@@ -7,13 +7,10 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProjectsController;
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('dashboard');
 });
 
 Route::get('/dashboard', [HomeController::class, 'index'])->name('dashboard');
-
-Route::get('/home', [HomeController::class, 'index'])->name('home.index');
-
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -32,6 +29,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/texts/{id}', [TextsController::class, 'show'])->name('texts.show');
     Route::get('/texts', [TextsController::class, 'index'])->name('texts.index');
+    Route::post('/texts/search', [TextsController::class, 'search'])->name('texts.search');
 });
 
 require __DIR__.'/auth.php';

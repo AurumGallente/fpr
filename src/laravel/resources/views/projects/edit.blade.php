@@ -7,7 +7,7 @@
                 @method('PATCH')
                 <!-- Name -->
                 <div class="form-group">
-                    <label class="label" for="name" :value="__('Name')" >Project's Name</label>
+                    <label class="label" for="name">Project's Name</label>
                     <input id="name" dusk="name" class="form-control" type="text" name="name" value="{{old('name') ? old('name') : $project->name}}" required autofocus autocomplete="name" />
                     <x-input-error :messages="$errors->get('name')" class="mt-2" />
                 </div>

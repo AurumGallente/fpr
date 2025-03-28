@@ -19,12 +19,13 @@ services:
   db:
       image: bitnami/postgresql:16.3.0
       platform: linux/amd64
-      shm_size: 512mb
+      shm_size: 1024mb
       ports:
           - "${POSTGRES_OUTER_PORT}:${POSTGRES_INNER_PORT}"
       restart: always
       volumes:
           - db-data:/bitnami/postgresql
+          - ./init-db:/docker-entrypoint-initdb.d
       environment:
           - POSTGRES_DATABASE=${POSTGRES_DATABASE}
           - POSTGRES_USERNAME=${POSTGRES_USERNAME}
@@ -35,12 +36,13 @@ services:
   db_test:
       image: bitnami/postgresql:16.3.0
       platform: linux/amd64
-      shm_size: 128mb
+      shm_size: 64mb
       ports:
           - "${POSTGRES_TEST_OUTER_PORT}:${POSTGRES_TEST_INNER_PORT}"
       restart: always
       volumes:
           - db-data2:/bitnami/postgresql
+          - ./init-db:/docker-entrypoint-initdb.d
       environment:
           - POSTGRES_DATABASE=${DB_TEST_DATABASE}
           - POSTGRES_USERNAME=${DB_TEST_USERNAME}
@@ -56,6 +58,7 @@ services:
     volumes:
       - "./src/laravel:/var/www/html"
       - "/var/www/html/node_modules"
+      - "./php/php.ini:/usr/local/etc/php/conf.d/custom.ini"
     networks:
       - docker-network
       - docker-testing-network
@@ -75,7 +78,7 @@ services:
         - docker-testing-network
 
   npm:
-    image: node:23-alpine3.20
+    image: node:latest
     volumes:
         - "./src/laravel:/var/www/html"
     entrypoint: ["npm"]
@@ -89,7 +92,7 @@ services:
 
   chrome:
     image: selenium/standalone-chromium:latest
-    shm_size: 2g
+    shm_size: 1g
     container_name: chrome_container
     ports:
       - "4444:4444"
@@ -104,9 +107,74 @@ services:
       - docker-testing-network
 
 
+  elasticsearch:
+    image: elasticsearch:8.16.4
+    container_name: elasticsearch
+    depends_on:
+      - nginx
+    ports:
+      - "${ES_OUTER_PORT}:${ES_INNER_PORT}"
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - xpack.security.enrollment.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - data-standalone:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:${ES_OUTER_PORT}"]
+      interval: 60s
+      timeout: 10s
+      retries: 5
+    networks:
+      - docker-network
+      - docker-testing-network
+
+#  kibana:
+#    image: docker.elastic.co/kibana/kibana:8.16.4
+#    container_name: kibana
+#    volumes:
+#      - kibana_data:/usr/share/kibana/data
+#    depends_on:
+#      - elasticsearch
+#    environment:
+#      - ELASTICSEARCH_HOSTS=${ES_HOSTS}
+#      - NODE_OPTIONS=--max-old-space-size=1024
+#    mem_limit: 1g
+#    ports:
+#      - "${KIBANA_OUTER_PORT}:${KIBANA_INNER_PORT}"
+#    networks:
+#      - docker-network
+#      - docker-testing-network
+
+  centrifugo:
+    container_name: centrifugo
+    image: centrifugo/centrifugo:v6
+    volumes:
+      - ./config.json:/centrifugo/config.json
+    command: centrifugo -c config.json
+    ports:
+      - "8001:8000"
+    ulimits:
+      nofile:
+        soft: 65535
+        hard: 65535
+    networks:
+      - docker-network
+      - docker-testing-network
+
+
+
 volumes:
     db-data:
     db-data2:
+    data-standalone:
+#    kibana_data:
+        driver: local
 
 networks:
     docker-network:

@@ -2,11 +2,13 @@
 
 namespace App\Providers;
 
+use App\Models\Chunk;
 use App\Models\Text;
 use App\Models\User;
 use Illuminate\Support\ServiceProvider;
 use App\Observers\TextObserver;
 use App\Observers\UserObserver;
+use App\Observers\ChunkObserver;
 use Illuminate\Support\Facades\Gate;
 use App\Policies\Api\V1\ProjectPolicy as V1ProjectPolicy;
 use App\Policies\Api\V1\TextPolicy as V1TextPolicy;
@@ -27,6 +29,7 @@ class AppServiceProvider extends ServiceProvider
     {
         Text::observe(TextObserver::class);
         User::observe(UserObserver::class);
+        Chunk::observe(ChunkObserver::class);
         Gate::define('v1-show', [V1ProjectPolicy::class, 'show']);
         Gate::define('v1-store', [V1ProjectPolicy::class, 'store']);
         Gate::define('v1-update', [V1ProjectPolicy::class, 'update']);

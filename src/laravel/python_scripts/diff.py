@@ -1,43 +1,59 @@
 import sys
 import json
+import re
+from collections import Counter
 
-def longest_substring(text1, text2):
-    words1 = text1.split()
-    words2 = text2.split()
+def split_words(text):
+    return text.split()
 
-    # Create a 2D list to store lengths of longest common suffixes
-    lengths = [[0] * (len(words2) + 1) for _ in range(len(words1) + 1)]
-    max_length = 0
-    end_index = 0
+def find_longest_common_sequence(words1, words2):
+    longest_common = ""
+    min_length = 4
 
-    # Build the lengths table
-    for i in range(1, len(words1) + 1):
-        for j in range(1, len(words2) + 1):
-            if words1[i - 1] == words2[j - 1]:
-                lengths[i][j] = lengths[i - 1][j - 1] + 1
-                if lengths[i][j] > max_length:
-                    max_length = lengths[i][j]
-                    end_index = i
-            else:
-                lengths[i][j] = 0
+    for length in range(min_length, min(len(words1), len(words2)) + 1):
+        words_count = Counter()
 
-    # Retrieve the longest substring
-    longest_substr = ' '.join(words1[end_index - max_length:end_index])
-    return longest_substr
+        for i in range(len(words1) - length + 1):
+            common_candidate = ' '.join(words1[i:i + length])
+            words_count[common_candidate] += 0  # Add key with initial count
+
+        for i in range(len(words2) - length + 1):
+            common_candidate = ' '.join(words2[i:i + length])
+            if common_candidate in words_count:
+                # Return the longest common sequence found
+                if len(common_candidate) > len(longest_common):
+                    longest_common = common_candidate
+
+    return longest_common
+
+def find_longest_common_sequence_only(text1, text2):
+    words1 = split_words(text1)
+    words2 = split_words(text2)
+
+    longest_common_sequence = find_longest_common_sequence(words1, words2)
+
+    # Remove the longest common sequence from both texts
+    if longest_common_sequence:
+        text1 = re.sub(re.escape(longest_common_sequence), "", text1)
+        text2 = re.sub(re.escape(longest_common_sequence), "", text2)
+
+    return longest_common_sequence
 
 if __name__ == "__main__":
+    # Check if the correct number of arguments are provided
     if len(sys.argv) != 3:
-        print("Usage: python longest_substring.py <text1> <text2>")
+        print(json.dumps({"error": "Please provide exactly two text arguments."}))
         sys.exit(1)
 
     text1 = sys.argv[1]
     text2 = sys.argv[2]
 
-    result = longest_substring(text1, text2)
+    # Find the longest common sequence
+    longest_common_sequence = find_longest_common_sequence_only(text1, text2)
 
     # Create a JSON response
     response = {
-        "longest_common_sequence": result
+        "longest_common_sequence": longest_common_sequence
     }
 
     # Print the JSON response

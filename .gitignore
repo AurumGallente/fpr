@@ -8,3 +8,4 @@ laravel-docker.test-key.pem
 laravel-docker.test.pem
 ES.edql
 config.json
+src/laravel/public/public/

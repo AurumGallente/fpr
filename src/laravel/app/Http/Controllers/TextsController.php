@@ -2,7 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\ReadabilityHelper;
+use App\Models\Chunk;
+use App\Models\ESChunk;
+use App\Models\EStext;
 use App\Models\Text;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -67,7 +72,17 @@ class TextsController extends Controller implements HasMiddleware
     public function show(Request $request): View
     {
         $text = Text::find($request->id);
-        return view('texts.show', ['text' => $text]);
+        $chunks = $text->chunks()->get();
+        $EStext = $text->EStext()->first();
+        if(!$EStext)
+        {
+            $EStext = new EStext();
+            $EStext->content = $text->content;
+            $EStext->normalized_content = $text->content;
+        }
+        $ESsearchResults = $EStext->findSimilarByChunks($chunks);
+        $DBsearchResults = $text->findSimilarByChunks();
+        return view('texts.show', ['text' => $text, 'EStext' => $EStext, 'ESsearchResults' => $ESsearchResults, 'DBsearchResults' => $DBsearchResults]);
     }
 
     /**
@@ -80,5 +95,26 @@ class TextsController extends Controller implements HasMiddleware
             ->orderBy('id','desc')
             ->paginate(self::PER_PAGE);
         return view('texts.index', ['texts' => $texts]);
+    }
+
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function search(Request $request): JsonResponse
+    {
+        $text = $request->get('text');
+        $helper = new ReadabilityHelper($text);
+        $chunks = collect($helper->chunking());
+        $EStext = new EStext();
+        $EStext->content = $text;
+        $ESchunk = new ESChunk;
+        //dd($ESchunk->where('original_content','like',$ESchunk->escapeElasticsearchQuery($text))->distinct()->limit(10)->get(['original_content','external_id', 'score']));
+        $searchResult = $EStext->findSimilarByChunks($chunks)->toArray();
+        return response()->json([
+            'texts' => $EStext->prettySearchResults($searchResult)
+        ]);
+
     }
 }
