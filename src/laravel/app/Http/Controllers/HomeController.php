@@ -7,6 +7,7 @@ use App\Helpers\ReadabilityHelper;
 use App\Models\Project;
 use App\Models\Text;
 use App\Models\User;
+use App\Services\MessagePublisher;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;

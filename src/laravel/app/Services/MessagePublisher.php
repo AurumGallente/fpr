@@ -37,7 +37,7 @@ class MessagePublisher
      */
     public static function getInstance(): MessagePublisher
     {
-        if(!self::$self)
+        if(!isset(self::$self))
         {
             self::$self = new MessagePublisher(self::getConfig(), self::getClient());
         }
@@ -61,7 +61,7 @@ class MessagePublisher
      */
     private static function getClient(): HttpClient
     {
-        if(!self::$httpClient)
+        if(!isset(self::$httpClient))
         {
             self::$httpClient = new HttpClient([]);
         }

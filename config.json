@@ -12,5 +12,10 @@
     "password": "password",
     "secret": "secret",
     "enabled": true
+  },
+  "channel": {
+    "without_namespace": {
+      "allow_subscribe_for_client": true
+    }
   }
 }

@@ -86,11 +86,11 @@ class User extends Authenticatable
     /**
      * @return string
      */
-    public function getCentrifugoPublicToken(): string
+    public function getCentrifugoPublicToken(int $time = 604800, array $channels = []): string
     {
         return MessagePublisher::getInstance()
             ->getMessenger()
-            ->generateConnectionToken((string)$this->id, 0, [
+            ->generateConnectionToken((string)$this->id, $time, [
             'name' => $this->email,
         ]);
     }
@@ -100,7 +100,7 @@ class User extends Authenticatable
      * @param int $time
      * @return string
      */
-    public function getCentrifugoPrivateToken(string $channel, int $time = 3600): string
+    public function getCentrifugoPrivateToken(string $channel, int $time = 36000): string
     {
         return MessagePublisher::getInstance()
             ->getMessenger()
