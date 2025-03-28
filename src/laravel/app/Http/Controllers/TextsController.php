@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\DiffHelper;
 use App\Helpers\ReadabilityHelper;
 use App\Models\Chunk;
 use App\Models\ESChunk;
 use App\Models\EStext;
 use App\Models\Text;
+use App\Search\SearchEngine;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -14,6 +17,7 @@ use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\View\View;
 use App\Models\Project;
+use JsonException;
 
 class TextsController extends Controller implements HasMiddleware
 {
@@ -82,7 +86,8 @@ class TextsController extends Controller implements HasMiddleware
         }
         $ESsearchResults = $EStext->findSimilarByChunks($chunks);
         $DBsearchResults = $text->findSimilarByChunks();
-        return view('texts.show', ['text' => $text, 'EStext' => $EStext, 'ESsearchResults' => $ESsearchResults, 'DBsearchResults' => $DBsearchResults]);
+        $helper = new DiffHelper();
+        return view('texts.show', ['text' => $text, 'EStext' => $EStext, 'ESsearchResults' => $ESsearchResults, 'DBsearchResults' => $DBsearchResults, 'helper' => $helper]);
     }
 
     /**
@@ -101,20 +106,33 @@ class TextsController extends Controller implements HasMiddleware
     /**
      * @param Request $request
      * @return JsonResponse
+     * @throws Exception
      */
     public function search(Request $request): JsonResponse
     {
         $text = $request->get('text');
-        $helper = new ReadabilityHelper($text);
-        $chunks = collect($helper->chunking());
-        $EStext = new EStext();
-        $EStext->content = $text;
-        $ESchunk = new ESChunk;
-        //dd($ESchunk->where('original_content','like',$ESchunk->escapeElasticsearchQuery($text))->distinct()->limit(10)->get(['original_content','external_id', 'score']));
-        $searchResult = $EStext->findSimilarByChunks($chunks)->toArray();
+        $engine = new SearchEngine();
+        $matches = $engine->setText($text)
+            ->setType(SearchEngine::TYPE_CHUNKS)
+            ->setSource(SearchEngine::SRC_ES)
+            ->search();
         return response()->json([
-            'texts' => $EStext->prettySearchResults($searchResult)
+            'texts' => $matches
         ]);
 
+    }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     * @throws JsonException
+     */
+    public function compare(Request $request): JsonResponse
+    {
+        $helper = new DiffHelper();
+        $substring = $helper->longestCommonSubstring($request->get('text1'), $request->get('text2'));
+        return response()->json([
+            'substring' => $substring
+        ]);
     }
 }

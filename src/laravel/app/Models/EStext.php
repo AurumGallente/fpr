@@ -91,15 +91,6 @@ class EStext extends Eloquent
             $bodyParams['from'] = $start;
         }
 
-        $bodyParams['query']['bool']['should'][] =
-            [
-                'more_like_this' =>
-                    [
-                        'fields' => ['original_content', 'normalized_content'],
-                        'like' => $content
-                    ]
-            ];
-
         foreach ($chunks as $chunk)
         {
             if($chunk instanceof Chunk)
@@ -143,6 +134,7 @@ class EStext extends Eloquent
      * @param array $searchResults
      * @param string $text
      * @return array
+     * @throws JsonException
      */
     public function prettySearchResults(array $searchResults, string $text = ''): array
     {

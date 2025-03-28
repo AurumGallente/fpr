@@ -29,6 +29,7 @@ class ElasticIndexes extends Command
 
     /**
      * Execute the console command.
+     * @throws ConnectionException
      */
     public function handle(): void
     {

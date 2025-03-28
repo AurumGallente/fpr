@@ -35,12 +35,12 @@
                         <a v-bind:href="item.link" target="_blank">
                             <p class="col-6 text-truncate">Text:
                                 <span class="italic">
-                                    @{{item.content}}
+                                    @{{item.common_string}}
                                 </span>
                             </p>
                         </a>
-                        For project: <a v-bind:href="item.project_link" target="_blank">
-                            @{{ item.project_id }}
+                        <a v-bind:href="item.project_link" target="_blank">
+                            For project: @{{ item.project_id }}
                         </a>
                 </li>
             </ul>
