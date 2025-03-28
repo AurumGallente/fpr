@@ -3,13 +3,18 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Filters\Api\V1\TextsFilter;
+use App\Http\Requests\V1\SearchTextRequest;
 use App\Http\Requests\V1\ShowProjectRequest;
 use App\Http\Resources\V1\TextsResource;
 use App\Models\Project;
+use App\Search\SearchEngine;
 use App\Traits\ApiFilter;
 use App\Traits\ApiResponses;
+use Couchbase\SearchResult;
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use App\Models\Text;
+use JsonException;
 
 class TextsController extends BaseController
 {
@@ -74,5 +79,22 @@ class TextsController extends BaseController
         $request->validate($request->rules(), $request->messages());
 
         return TextsResource::collection(Text::filter($filter)->paginate());
+    }
+
+    /**
+     * Check text uniqueness
+     * @group Search
+     * @response 200 ["В одной марийской легенде говорится что однажды некий шаман провёл ритуал", "expedita officiis temporibus aut fugit Dolores nihil quam repudiandae placeat", "Architecto amet qui fugiat veniam fugit quidem Harum possimus"]
+     */
+    public function search(SearchTextRequest $request): \Illuminate\Support\Collection
+    {
+        $text = $request->input('data.attributes.text');
+        $engine = new SearchEngine();
+        $matches = $engine->setText($text)
+            ->setType(SearchEngine::TYPE_CHUNKS)
+            ->setSource(SearchEngine::SRC_ES)
+            ->search();
+
+        return $matches->pluck(['common_string']);
     }
 }

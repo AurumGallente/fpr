@@ -18,6 +18,7 @@ Route::prefix('V1')->group(function () {
     Route::name('api.')->middleware('auth:sanctum')->group(function () {
         Route::apiResource('projects', ProjectsController::class);
         Route::apiResource('projects.texts', TextsController::class);
+        Route::post('texts/search', [TextsController::class, 'search'])->name('texts.search');
         Route::apiresource('languages', LanguageController::class)->only(['index', 'show']);
     });
 

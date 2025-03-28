@@ -39,6 +39,11 @@ class SearchEngine
     const string TYPE_FULLTEXT = 'type_fulltext';
 
     /**
+     * @var Collection
+     */
+    public Collection $result;
+
+    /**
      * @param string $source
      * @return $this
      * @throws Exception
@@ -101,7 +106,7 @@ class SearchEngine
         switch (true)
         {
             case $this->source === self::SRC_SQL && $this->type === self::TYPE_CHUNKS:
-                //
+                throw new Exception('Not implemented');
                 break;
             case $this->source === self::SRC_ES && $this->type === self::TYPE_CHUNKS:
                     $helper = new ReadabilityHelper($this->text);
@@ -122,8 +127,8 @@ class SearchEngine
                 throw new Exception('Setup of search engine is wrong');
                 break;
         }
-
-        return $result;
+        $this->result = $result;
+        return $this->result;
     }
 
     /**
